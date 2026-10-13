@@ -1,0 +1,48 @@
+{
+  "source_reference": "Original.png from Menu 2(1).rar; open-top shumai",
+  "file_bytes": 2487384,
+  "glTF_version": "2.0",
+  "nodes": {
+    "wrapper_shell": {
+      "triangles": 15040,
+      "closed_surface_after_seam_weld": true,
+      "nonmanifold_edges": 0,
+      "independent_parent": "kalili_dimsum_root"
+    },
+    "meat_filling": {
+      "triangles": 10528,
+      "closed_surface_after_seam_weld": true,
+      "nonmanifold_edges": 0,
+      "independent_parent": "kalili_dimsum_root"
+    },
+    "vegetable_pieces": {
+      "triangles": 1836,
+      "closed_surface_after_seam_weld": true,
+      "nonmanifold_edges": 0,
+      "independent_parent": "kalili_dimsum_root"
+    },
+    "carrot_mix": {
+      "triangles": 2376,
+      "closed_surface_after_seam_weld": true,
+      "nonmanifold_edges": 0,
+      "independent_parent": "kalili_dimsum_root"
+    },
+    "carrot_topping": {
+      "triangles": 9504,
+      "closed_surface_after_seam_weld": true,
+      "nonmanifold_edges": 0,
+      "independent_parent": "kalili_dimsum_root"
+    }
+  },
+  "triangles": 39284,
+  "reassembly_max_matrix_error": 0.0,
+  "moving_meat_leaves_other_groups_unchanged": true,
+  "textures_embedded": true,
+  "texture_count": 4,
+  "animation_name": "assemble_explode_reassemble",
+  "animation_duration": 8,
+  "animation_paths": [
+    "translation"
+  ],
+  "default_pose": "assembled"
+}

@@ -1,4 +1,5 @@
 import { BlackSeriesFeature } from "@/components/BlackSeriesFeature";
+import { DimsumAnatomy } from "@/components/DimsumAnatomy";
 import { EntryGate } from "@/components/EntryGate";
 import { Experience } from "@/components/Experience";
 import { HeroStage } from "@/components/HeroStage";
@@ -20,6 +21,7 @@ export default function Page() {
         <HeroStage />
         <Marquee />
         <SteamStory />
+        <DimsumAnatomy />
         <MenuSection />
         <BlackSeriesFeature />
         <KaliliMoments />

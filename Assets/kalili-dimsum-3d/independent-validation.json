@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "triangles": 39284,
+  "bytes": 2487384,
+  "width_metres": 0.06000000238418579,
+  "assembled_bounds_y_up": [
+    [
+      -0.03004859946668148,
+      -9.313225746154785e-10,
+      -0.02904428541660309
+    ],
+    [
+      0.02995140291750431,
+      0.03991358866915107,
+      0.03051048330962658
+    ]
+  ],
+  "embedded_image_sizes": [
+    [
+      512,
+      512
+    ],
+    [
+      512,
+      512
+    ],
+    [
+      512,
+      512
+    ],
+    [
+      512,
+      512
+    ]
+  ],
+  "five_direct_sibling_ingredient_nodes": true,
+  "normals_unit_length": true,
+  "tangents_present": true,
+  "scale_constant": true,
+  "first_last_pose_exactly_equal": true,
+  "animation_holds_exact": true,
+  "outbound_return_path_match": true,
+  "default_pose_max_error": 0
+}

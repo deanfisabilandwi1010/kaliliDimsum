@@ -1,0 +1,199 @@
+{
+  "coordinate_system": "glTF Y-up; metres; quaternion x,y,z,w",
+  "root": "kalili_dimsum_root",
+  "animation": "assemble_explode_reassemble",
+  "duration_seconds": 8,
+  "loop": false,
+  "nodes": {
+    "wrapper_shell": {
+      "assembled": {
+        "translation": [
+          0.0,
+          0.014504886315855085,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "exploded": {
+        "translation": [
+          0.0,
+          0.0020721268922390458,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "meat_filling": {
+      "assembled": {
+        "translation": [
+          0.0,
+          0.020410446607863602,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "exploded": {
+        "translation": [
+          0.0,
+          0.05874478639501301,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "vegetable_pieces": {
+      "assembled": {
+        "translation": [
+          0.0,
+          0.027973709185590646,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "exploded": {
+        "translation": [
+          -0.06423592208050101,
+          0.09635388698038798,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "carrot_mix": {
+      "assembled": {
+        "translation": [
+          0.0,
+          0.026937645739471126,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "exploded": {
+        "translation": [
+          0.06423592208050101,
+          0.09531782160445022,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "carrot_topping": {
+      "assembled": {
+        "translation": [
+          0.0,
+          0.03937040323326893,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "exploded": {
+        "translation": [
+          0.0,
+          0.14815703998818178,
+          -0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  }
+}

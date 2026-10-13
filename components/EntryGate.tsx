@@ -13,9 +13,10 @@ const START_TIMEOUT_MS = 5000;
 const LEAD_SECONDS = 0.9;
 /** Batas tunggu pemuatan: setelah ini gerbang tetap dibuka apa pun yang terjadi. */
 const LOAD_TIMEOUT_MS = 7000;
+const INTRO_URL = "/video/intro.mp4";
 
 /** Aset yang benar-benar dipakai gerbang dan layar pertama; progres mengikuti unduhannya. */
-function preloadList(lite: boolean) {
+function preloadList() {
   const frames = window.innerWidth <= 900 ? "m" : "d";
   const images = [
     "/retro/steamer.webp",
@@ -24,9 +25,7 @@ function preloadList(lite: boolean) {
     `/frames/story/${frames}/0001.webp`,
     ...(brand.logo ? [brand.logo] : []),
   ];
-  // Mode ringan tidak memutar video, jadi tidak ikut diunduh.
-  const media = lite ? [] : ["/video/intro.mp4", "/video/hero-loop.mp4"];
-  return { images, media };
+  return { images };
 }
 
 type Phase = "idle" | "opening" | "playing" | "leaving" | "done";
@@ -72,8 +71,11 @@ export function EntryGate() {
     const gate = gateRef.current;
     const loader = loaderRef.current;
     if (!gate || !loader) return;
-    const { images, media } = preloadList(lite);
-    const total = images.length + media.length + 1;
+    const { images } = preloadList();
+    // Video pembuka dimuat lewat elemen <video>-nya sendiri (satu unduhan, bukan
+    // fetch terpisah). Mode ringan tidak memutar video, jadi tidak dimuat.
+    const video = lite ? null : videoRef.current;
+    const total = images.length + (video ? 1 : 0) + 1;
     const shown = { value: 0 };
     let done = 0;
     let finished = false;
@@ -129,7 +131,19 @@ export function EntryGate() {
       img.onload = img.onerror = bump;
       img.src = src;
     }
-    for (const src of media) fetch(src).then((r) => r.blob()).catch(() => {}).finally(bump);
+    if (video) {
+      let counted = false;
+      const ready = () => {
+        if (counted) return;
+        counted = true;
+        bump();
+      };
+      video.addEventListener("canplaythrough", ready, { once: true });
+      video.addEventListener("error", ready, { once: true });
+      video.preload = "auto";
+      video.src = INTRO_URL;
+      if (video.readyState >= 4) ready();
+    }
     (document.fonts?.ready ?? Promise.resolve()).then(bump, bump);
 
     return () => {
@@ -192,7 +206,8 @@ export function EntryGate() {
     setPhase("opening");
     warmUp();
     video.muted = !sound;
-    video.src = "/video/intro.mp4";
+    // Biasanya sudah dimuat oleh layar pemuatan; menyetel ulang src akan mengulang unduhan.
+    if (!video.getAttribute("src")) video.src = INTRO_URL;
     // Dipanggil di dalam gesture klik agar pemutaran diizinkan browser, lalu
     // ditahan di frame pertama sampai layar video mulai terbuka.
     video

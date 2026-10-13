@@ -1,7 +1,7 @@
 // Membuat turunan web di public/ dari master di Assets/. Master tidak diubah.
 // Jalankan: npm run assets
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ffmpegPath from "ffmpeg-static";
@@ -121,6 +121,11 @@ async function images() {
     .flatten({ background: "#fff2da" })
     .png()
     .toFile(path.join(root, "app", "icon.png"));
+
+  // Model 3D siomay: GLB dipakai apa adanya; pratinjau utuh jadi poster/fallback.
+  dir("models");
+  copyFileSync(src("kalili-dimsum-3d/kalili-dimsum-ingredients.glb"), out("models", "kalili-dimsum.glb"));
+  await sharp(src("kalili-dimsum-3d/kalili-assembled.png")).trim().resize({ width: 900 }).webp({ quality: 86, alphaQuality: 92 }).toFile(out("models", "dimsum-assembled.webp"));
 
   dir("moments");
   for (const id of ["1140", "1180", "1205"]) {

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { formatIDR, products, type Product } from "@/content/products";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { HANDOFF } from "@/lib/motion/handoff";
 import { useExperience } from "./Experience";
 import { Arrow, ProductImage } from "./ui";
 
@@ -73,8 +74,12 @@ export function MenuSection() {
     // 1 px scroll = 1 px geser. Setelah deretan habis, menu tetap menempel satu
     // layar lagi (hold) sementara panel Black Series naik menutupinya.
     const hold = () => pin.offsetHeight;
+    // Bagian awal section menumpuk di atas akhir adegan siomay 3D (serah-terima):
+    // selama itu panggung menu sudah menempel tetapi baru muncul perlahan, dan
+    // deretan menu belum bergeser.
+    const tail = () => pin.offsetHeight * HANDOFF;
     const setHeight = () => {
-      root.style.height = `${pin.offsetHeight + distance() + hold()}px`;
+      root.style.height = `${pin.offsetHeight + tail() + distance() + hold()}px`;
     };
     setHeight();
     ScrollTrigger.addEventListener("refreshInit", setHeight);
@@ -125,18 +130,31 @@ export function MenuSection() {
 
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>(".card");
-      const range = { trigger: root, start: "top top", end: () => `+=${distance()}` };
+      const range = { trigger: root, start: () => `top+=${tail()} top`, end: () => `+=${distance()}` };
       const travel = gsap.to(track, {
         x: () => -distance(),
         ease: "none",
         onUpdate: light,
         scrollTrigger: { ...range, scrub: 0.5, invalidateOnRefresh: true },
       });
-      // Lampu ruangan padam saat section mulai menempel.
-      gsap.fromTo(pin, { "--night": 0 }, {
-        "--night": 1, ease: "none",
-        scrollTrigger: { trigger: root, start: "top 62%", end: "top top", scrub: true },
-      });
+      // Panggung selalu gelap di mode ini; kegelapannya datang dari adegan siomay
+      // yang meredup lebih dulu. Panggung lalu muncul di tempat: sorot dan
+      // kukusan pertama dulu, judul dan garis progres menyusul.
+      gsap.set(pin, { "--night": 1 });
+      pin.style.pointerEvents = "none";
+      gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: root, start: "top top", end: () => `+=${tail()}`, scrub: 0.4, invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            pin.style.pointerEvents = self.progress > 0.75 ? "" : "none";
+          },
+        },
+      })
+        .fromTo(pin, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.36, ease: "power1.inOut" }, 0.46)
+        .fromTo(".menu__head > *", { y: 36, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.2, stagger: 0.04, ease: "power2.out" }, 0.68)
+        .fromTo(".menu__progress", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12 }, 0.86)
+        .set({}, {}, 1);
       gsap.fromTo(".menu__bar-fill", { scaleX: 0 }, { scaleX: 1, ease: "none", scrollTrigger: { ...range, scrub: 0.5 } });
 
       // Tiap sajian berputar seperti piring saat melintasi layar, dan nomor
@@ -150,12 +168,7 @@ export function MenuSection() {
       // Selama hold: menu mundur dan meredup di bawah panel yang naik.
       gsap.to(pin, {
         scale: 0.93, yPercent: -4, "--dim": 0.55, ease: "none",
-        scrollTrigger: { trigger: root, start: () => `top+=${distance()} top`, end: "bottom bottom", scrub: 0.3, invalidateOnRefresh: true },
-      });
-
-      gsap.from(".menu__head > *", {
-        autoAlpha: 0, y: 32, duration: 0.9, ease: "power3.out", stagger: 0.1,
-        scrollTrigger: { trigger: root, start: "top 70%" },
+        scrollTrigger: { trigger: root, start: () => `top+=${tail() + distance()} top`, end: "bottom bottom", scrub: 0.3, invalidateOnRefresh: true },
       });
     }, root);
 
@@ -163,7 +176,7 @@ export function MenuSection() {
     const toCard = (card: HTMLElement, behavior: ScrollBehavior) => {
       const top = root.getBoundingClientRect().top + window.scrollY;
       const x = card.offsetLeft - (pin.clientWidth - card.offsetWidth) / 2;
-      window.scrollTo({ top: top + Math.min(distance(), Math.max(0, x)), behavior });
+      window.scrollTo({ top: top + tail() + Math.min(distance(), Math.max(0, x)), behavior });
     };
     const cardFor = (hash: string) => (hash.startsWith("#menu-") ? track.querySelector<HTMLElement>(`[id="${hash.slice(1)}"]`) : null);
     const onClick = (e: MouseEvent) => {
@@ -212,13 +225,17 @@ export function MenuSection() {
       window.removeEventListener("hashchange", onHash);
       track.removeEventListener("focusin", onFocus);
       ctx.revert();
+      pin.style.pointerEvents = "";
       root.style.height = "";
       ScrollTrigger.refresh();
     };
   }, [lite]);
 
   return (
-    <section ref={rootRef} id="menu" className="menu" data-tone-section="light" aria-labelledby="menu-title">
+    <section ref={rootRef} className="menu" data-tone-section="light" aria-labelledby="menu-title">
+      {/* Sasaran tautan #menu. Di mode penuh letaknya setelah serah-terima, jadi
+          tautan mendarat saat panggung menu sudah tampil penuh. */}
+      <span id="menu" className="menu__anchor" aria-hidden="true" />
       <div ref={pinRef} className="menu__pin">
         <span className="menu__spot" aria-hidden="true">
           <span className="menu__beam" />

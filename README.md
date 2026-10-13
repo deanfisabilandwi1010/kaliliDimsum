@@ -16,7 +16,7 @@ npm run build && npm run start   # build produksi
 
 Next.js (App Router) + TypeScript, GSAP + ScrollTrigger, CSS biasa dengan custom properties. Tanpa smooth-scroll library; scroll native.
 
-Ini implementasi **2.5D**: tidak ada model GLB di aset, jadi tidak ada Three.js/React Three Fiber. Gerak "3D" berasal dari empat video yang disediakan.
+Sebagian besar gerak berasal dari empat video yang disediakan (2.5D). Satu bagian memakai model 3D nyata: `Assets/kalili-dimsum-3d/kalili-dimsum-ingredients.glb`, dirender dengan Three.js (tanpa React Three Fiber) di `components/DimsumAnatomy.tsx` dan `lib/three/dimsum-scene.ts`. Uraian bahan pada model bersifat ilustratif, bukan verifikasi resep.
 
 ## Pemakaian empat video
 
@@ -45,6 +45,8 @@ Agar video menyatu dengan halaman: warna latar section diambil dari tepi frame (
 | Hero | Menempel 70svh: teks naik, panggung menyusut menjadi portal lengkung di atas merah |
 | Pita merek | Berjalan sendiri; laju, arah, dan kemiringan mengikuti kecepatan scroll |
 | Ritual kukusan | Menempel; frame video di-scrub, kamera mendekat pelan |
+| Anatomi siomay (3D) | Menempel; model GLB dirender Three.js, scroll menentukan waktu klip `assemble_explode_reassemble` (progress × 8 dtk, tanpa autoplay): utuh → terurai dengan label Kulit/Daging/Sayuran/Wortel → menyatu → tombol Lihat Menu. Three.js dan model baru dimuat saat section mendekat; jika WebGL gagal atau mode ringan, tampil gambar siomay utuh + daftar bahan. Interaktif: seret untuk memutar (di layar sentuh hanya mendatar, gerak tegak tetap menggulir), klik bahan atau tombol namanya untuk mendekat dan melihat detail; menggulir lagi atau Escape melepas fokus. Tiap pilihan punya gerak sendiri (kamera meluncur antar-bahan, silang-pudar, riak emas, kartu detail masuk ulang). Adegan memakai bayangan nyata (VSM 1024), cahaya tepi, dan model berputar pelan mengikuti scroll |
+| Serah-terima 3D → menu | Kedua section menumpuk 120svh (`lib/motion/handoff.ts`): di adegan yang sama lampu padam, siomay 3D meluncur ke titik sorot dan mengecil seukuran satu siomay, lalu panggung menu muncul di tempat di sekelilingnya (sorot dan kukusan pertama dulu, judul menyusul). Tautan `#menu` mendarat setelah serah-terima |
 | Menu | Menempel; lampu padam, scroll vertikal menggeser deretan menu ke samping melewati sorot lampu di tengah (gaya layar pilih karakter game fighting); sajian di bawah sorot membesar dan terang, lainnya meredup |
 | Black Series | Menempel; cahaya video menyala mengikuti scroll |
 | Cerita | Foto menyebar dari satu tumpukan; pita teks besar melintas ke samping |

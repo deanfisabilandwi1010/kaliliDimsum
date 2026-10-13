@@ -1,0 +1,36 @@
+{
+  "story": {
+    "d": {
+      "count": 174,
+      "width": 1280,
+      "height": 720
+    },
+    "m": {
+      "count": 87,
+      "width": 854,
+      "height": 480
+    }
+  },
+  "black": {
+    "d": {
+      "count": 96,
+      "width": 1280,
+      "height": 720
+    },
+    "m": {
+      "count": 64,
+      "width": 854,
+      "height": 480
+    }
+  },
+  "colors": {
+    "storyStartTop": "#d3bfa0",
+    "storyStartBottom": "#d8c29d",
+    "storyEndTop": "#d4c09f",
+    "storyEndBottom": "#dfcbaa",
+    "blackEndBottom": "#3a210d",
+    "blackEndLeft": "#6d4f3e",
+    "heroTop": "#d1bc9d",
+    "heroBottom": "#dcc8ac"
+  }
+}

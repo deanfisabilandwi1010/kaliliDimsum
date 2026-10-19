@@ -180,9 +180,15 @@ export function DimsumAnatomy() {
     const onArrive = (event: Event) => {
       if ((event as CustomEvent<string>).detail !== "anatomi") return;
       sceneRef.current?.nudge(0.16);
-      gsap.from(rootRef.current!.querySelectorAll(".anatomy__copy > .eyebrow, .anatomy__title, .anatomy__phases, .anatomy__explore"), {
-        y: 34, autoAlpha: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, clearProps: "transform",
-      });
+      // fromTo dengan nilai akhir eksplisit, bukan from(): from() memakai
+      // keadaan saat dipanggil sebagai tujuan, dan elemen yang sedang memudar
+      // (mis. transisi opacity .anatomy__phases) bisa berakhir tak terlihat.
+      // Setelah selesai semua gaya inline dihapus, kembali ke stylesheet.
+      gsap.fromTo(
+        rootRef.current!.querySelectorAll(".anatomy__copy > .eyebrow, .anatomy__title, .anatomy__phases, .anatomy__explore"),
+        { y: 34, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.8, ease: "power3.out", stagger: 0.08, overwrite: "auto", clearProps: "transform,opacity,visibility" },
+      );
     };
     window.addEventListener(ARRIVE, onArrive);
     return () => window.removeEventListener(ARRIVE, onArrive);

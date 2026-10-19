@@ -84,6 +84,7 @@ export function HeroStage() {
   const [swing, setSwing] = useState<[string, string]>(["", ""]);
   const [jump, setJump] = useState("");
   const motion = lite === false;
+  const gateDone = entered || warm;
   const product = productById(picked?.productId ?? BUILT_IN_PRODUCT)!;
   const quantity = selection[product.id] ?? 0;
   const facts = factsOf(product);
@@ -93,7 +94,10 @@ export function HeroStage() {
   // dan seluruh kontrol HTML sudah tampil lebih dulu. Jika WebGL atau model
   // gagal, poster kukusan terbuka tetap dipakai.
   useEffect(() => {
-    if (!motion) return;
+    // Selama gerbang pembuka tampil, kukusan 3D gerbang yang dipakai; adegan
+    // hero baru dibuat saat gerbang dibuka atau dilewati (GLB sudah di cache),
+    // supaya tidak ada dua adegan WebGL yang berjalan bersamaan.
+    if (!motion || !gateDone) return;
     let disposed = false;
     const compact = window.matchMedia("(max-width: 760px), (max-aspect-ratio: 1/1)").matches;
     import("@/lib/three/steamer-scene")
@@ -170,17 +174,18 @@ export function HeroStage() {
       setHover(null);
       setInScene([]);
     };
-  }, [motion]);
+  }, [motion, gateDone]);
 
   const open = useCallback(() => sceneRef.current?.open(), []);
 
-  // Pengunjung yang menekan "Buka kukusannya" di gerbang sudah meminta kukusan
-  // dibuka: tutupnya terangkat sendiri begitu hero terlihat, tanpa klik kedua.
+  // Pengunjung yang sudah membuka kukusan di gerbang ("tahan untuk membuka")
+  // tidak melihat pembukaan kedua: kukusan di hero langsung tampil terbuka,
+  // berlanjut dari uap yang memenuhi layar saat gerbang selesai.
   useEffect(() => {
     // Hanya sekali: kukusan yang ditutup lagi oleh pengunjung tidak membuka sendiri.
     if (live && entered && warm && stage === "closed" && !autoOpenedRef.current) {
       autoOpenedRef.current = true;
-      open();
+      sceneRef.current?.open(true);
     }
   }, [live, entered, warm, stage, open]);
 
@@ -237,12 +242,19 @@ export function HeroStage() {
 
   // "Kenali Isinya": angkat siomay Original dulu, baru menuju bagian ceritanya.
   const explore = (event: React.MouseEvent) => {
-    if (!live || stage !== "open" || !sceneRef.current) return;
+    if (!live || !sceneRef.current) return;
+    // Selalu ditangani di sini selama 3D aktif: klik kedua saat siomay masih
+    // naik tidak boleh memicu lompatan tautan #anatomi bawaan browser.
     event.preventDefault();
+    if (stage === "lifting") return;
     closeCard(false);
-    setStage("lifting");
     const scene = sceneRef.current;
-    scene.lift();
+    // Sudah terangkat (pengunjung kembali ke hero): langsung menyelam lagi.
+    const lifting = stage === "open";
+    if (lifting) {
+      setStage("lifting");
+      scene.lift();
+    }
     // Saat siomay masih naik, ia "menyelam" ke bagian anatomi: iris terbuka
     // dari siomay itu, halaman pindah di balik tirai, dan siomay mendarat tepat
     // di tempat model 3D anatomi, tanpa menggulir melewati bagian di antaranya.
@@ -268,7 +280,7 @@ export function HeroStage() {
         },
         onArrive: () => window.dispatchEvent(new CustomEvent(ARRIVE, { detail: STORY_ID })),
       });
-    }, 380);
+    }, lifting ? 380 : 0);
   };
 
   // "Pilih sajian": memilih produk yang sama dengan siomay 3D-nya. Produk yang

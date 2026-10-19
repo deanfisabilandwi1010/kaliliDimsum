@@ -15,7 +15,13 @@ import type { SteamerSlot } from "@/content/steamer-slots";
 
 export type SteamerScene = {
   /** Putar entrance_open satu kali (tutup terangkat). */
-  open: () => void;
+  /**
+   * Buka tutup dari posisinya sekarang (entrance_open). instant = langsung
+   * terbuka tanpa animasi, mis. hero di balik gerbang yang sudah dibuka pengunjung.
+   */
+  open: (instant?: boolean) => void;
+  /** Angkat tutup sebagian (0–1 dari klip pembuka) selama kukusan masih tertutup. */
+  setLid: (amount: number) => void;
   /** Tutup kembali (entrance_open diputar mundur); siomay yang terangkat diturunkan dulu. */
   close: () => void;
   /** Angkat siomay Original (hero_lift). */
@@ -60,26 +66,36 @@ type Options = {
   logoUrl?: string | null;
   /** Komposisi ringkas (mobile): transisi lebih singkat. */
   compact: boolean;
-  onOpening: () => void;
-  onOpened: () => void;
-  onClosing: () => void;
-  onClosed: () => void;
+  /**
+   * false = hanya tampilan (mis. gerbang pembuka): tanpa seret, klik, hover,
+   * atau kemiringan kursor; pemanggil yang menggerakkan tutup lewat setLid().
+   */
+  interactive?: boolean;
+  /**
+   * "open" (bawaan) = bingkai kamera memuat pose tertutup dan terbuka;
+   * "closed" = hanya pose tertutup, kukusan mengisi bingkai (gerbang).
+   */
+  framing?: "open" | "closed";
+  onOpening?: () => void;
+  onOpened?: () => void;
+  onClosing?: () => void;
+  onClosed?: () => void;
   /** Kursor di atas tutup yang bisa diklik untuk menutup (x/y di kanvas); null = tidak. */
-  onLidHover: (point: { x: number; y: number } | null) => void;
-  onLifted: () => void;
+  onLidHover?: (point: { x: number; y: number } | null) => void;
+  onLifted?: () => void;
   /** Isi kukusan: tempat, identitas menu, dan model penggantinya. */
-  slots: SteamerSlot[];
+  slots?: SteamerSlot[];
   /** Produk yang diwakili siomay bawaan kukusan (dipakai selama/jika varian gagal dimuat). */
-  builtInProduct: string;
+  builtInProduct?: string;
   /** Siomay dipilih (klik/ketuk atau kontrol HTML); null = pilihan dilepas. */
-  onSelect: (pick: FoodPick | null) => void;
+  onSelect?: (pick: FoodPick | null) => void;
   /** Kursor di atas siomay (mouse saja); null = tidak ada. */
-  onHover: (pick: FoodPick | null) => void;
+  onHover?: (pick: FoodPick | null) => void;
   /** Daftar instance dan produknya berubah (varian selesai dimuat). */
-  onInstances: (list: { instanceId: string; productId: string }[]) => void;
+  onInstances?: (list: { instanceId: string; productId: string }[]) => void;
   /** Pengguna mulai menyeret atau memilih (untuk menyembunyikan petunjuk). */
-  onInteract: () => void;
-  onContextLost: () => void;
+  onInteract?: () => void;
+  onContextLost?: () => void;
 };
 
 const ROOT = "kalili_steamer_root";
@@ -105,9 +121,11 @@ const LIFT_HOVER = 0.003;
 const LIFT_SELECTED = 0.005;
 
 export async function createSteamerScene(options: Options): Promise<SteamerScene> {
+  const noop = () => {};
   const {
-    canvas, frame: frameEl, url, logoUrl, compact, slots, builtInProduct,
-    onOpening, onOpened, onClosing, onClosed, onLidHover, onLifted, onSelect, onHover, onInstances, onInteract, onContextLost,
+    canvas, frame: frameEl, url, logoUrl, compact, interactive = true, framing = "open", slots = [], builtInProduct = "original",
+    onOpening = noop, onOpened = noop, onClosing = noop, onClosed = noop, onLidHover = noop, onLifted = noop,
+    onSelect = noop, onHover = noop, onInstances = noop, onInteract = noop, onContextLost = noop,
   } = options;
   const [THREE, { GLTFLoader }, { RoomEnvironment }] = await Promise.all([
     import("three"),
@@ -202,7 +220,7 @@ export async function createSteamerScene(options: Options): Promise<SteamerScene
   // kanan-belakang, siomay terangkat), bukan hanya pose tertutup yang lebih kecil.
   const bounds = new THREE.Box3();
   const box = new THREE.Box3();
-  for (const pose of [[0, 0], [1, 1]]) {
+  for (const pose of framing === "closed" ? [[0, 0]] : [[0, 0], [1, 1]]) {
     progress[0] = pose[0];
     progress[1] = pose[1];
     apply();
@@ -887,15 +905,28 @@ export async function createSteamerScene(options: Options): Promise<SteamerScene
     frame = requestAnimationFrame(tick);
   };
 
-  const open = () => {
+  const open = (instant = false) => {
     if (stage !== "closed") return;
     stage = "opening";
     onOpening();
-    const seconds = compact ? 1.9 : 2.4;
+    if (instant) {
+      tween = null;
+      progress[0] = 1;
+      apply();
+      steamUniforms.uIntensity.value = 1;
+      stage = "open";
+      onOpened();
+      wake();
+      return;
+    }
+    // Lanjut dari posisi tutup sekarang (mis. sudah terangkat sebagian oleh
+    // gerbang "tahan untuk membuka"); sisa durasi ikut memendek.
+    const from = Math.min(progress[0], 0.95);
+    const seconds = (compact ? 1.9 : 2.4) * Math.max(0.35, 1 - from);
     // Semburan uap tepat saat tutup lepas dari bibir kukusan.
-    burst(1, seconds * 0.28);
+    burst(1, from > 0.2 ? 0.05 : seconds * 0.28);
     tween = {
-      index: 0, seconds, start: performance.now(), shape: (t) => t,
+      index: 0, seconds, start: performance.now(), shape: (t) => from + (1 - from) * t,
       done: () => {
         stage = "open";
         onOpened();
@@ -1092,17 +1123,21 @@ export async function createSteamerScene(options: Options): Promise<SteamerScene
     tiltX = (event.clientY / window.innerHeight - 0.5) * 2 * MAX_TILT * 0.6;
     wake();
   };
-  canvas.addEventListener("pointerdown", onDown);
-  canvas.addEventListener("pointermove", onMove);
-  canvas.addEventListener("pointerup", onUp);
-  canvas.addEventListener("pointercancel", onUp);
+  if (interactive) {
+    canvas.addEventListener("pointerdown", onDown);
+    canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerup", onUp);
+    canvas.addEventListener("pointercancel", onUp);
+  }
   const onLeave = () => {
     delete canvas.dataset.hover;
     setHover(null);
     setLidHover(null);
   };
-  canvas.addEventListener("pointerleave", onLeave);
-  window.addEventListener("pointermove", onWindowPointer, { passive: true });
+  if (interactive) {
+    canvas.addEventListener("pointerleave", onLeave);
+    window.addEventListener("pointermove", onWindowPointer, { passive: true });
+  }
 
   const fit = () => {
     const width = canvas.clientWidth || 1;
@@ -1240,6 +1275,13 @@ export async function createSteamerScene(options: Options): Promise<SteamerScene
   return {
     open,
     close,
+    setLid: (amount: number) => {
+      if (stage !== "closed") return;
+      tween = null;
+      progress[0] = Math.min(1, Math.max(0, amount));
+      apply();
+      wake();
+    },
     lift: () => {
       if (stage !== "open") return;
       stage = "lifting";

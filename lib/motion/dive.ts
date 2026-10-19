@@ -5,6 +5,8 @@ export const ARRIVE = "kalili:arrive";
 
 type Rect = { x: number; y: number; width: number };
 
+let running = false;
+
 /**
  * Transisi "menyelam" dari satu siomay ke bagian lain, tanpa menggulir melewati
  * isi di antaranya:
@@ -26,6 +28,9 @@ export function dive(options: {
   target: () => Rect;
   onArrive?: () => void;
 }) {
+  // Klik ganda cepat tidak boleh memutar dua transisi (dan dua sambutan) sekaligus.
+  if (running) return;
+  running = true;
   const { from, image, section, veilClass, target, onArrive } = options;
   const root = document.createElement("div");
   root.className = "dive";
@@ -47,7 +52,12 @@ export function dive(options: {
   paint();
 
   gsap
-    .timeline({ onComplete: () => root.remove() })
+    .timeline({
+      onComplete: () => {
+        root.remove();
+        running = false;
+      },
+    })
     .to(dish, { autoAlpha: 1, scale: 1.08, duration: 0.3, ease: "power2.out" }, 0)
     .to(iris, { r: reach, duration: 0.62, ease: "power2.in", onUpdate: paint }, 0.12)
     .add(() => {

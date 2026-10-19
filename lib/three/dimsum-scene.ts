@@ -11,6 +11,8 @@ export type DimsumScene = {
   focus: (node: string | null) => void;
   /** Kembalikan putaran model ke sudut awal. */
   resetView: () => void;
+  /** Putaran sambutan satu kali (inersia yang sama dengan seret), mis. saat pengunjung tiba. */
+  nudge: (amount: number) => void;
   dispose: () => void;
 };
 
@@ -486,6 +488,11 @@ export async function createDimsumScene(options: Options): Promise<DimsumScene> 
     resetView: () => {
       spin = 0;
       returning = true;
+      wake();
+    },
+    nudge: (amount: number) => {
+      returning = false;
+      spin = amount;
       wake();
     },
     dispose: () => {

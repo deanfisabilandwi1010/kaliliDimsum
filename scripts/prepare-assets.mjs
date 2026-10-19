@@ -127,6 +127,18 @@ async function images() {
   copyFileSync(src("kalili-dimsum-3d/kalili-dimsum-ingredients.glb"), out("models", "kalili-dimsum.glb"));
   await sharp(src("kalili-dimsum-3d/kalili-assembled.png")).trim().resize({ width: 900 }).webp({ quality: 86, alphaQuality: 92 }).toFile(out("models", "dimsum-assembled.webp"));
 
+  // Kukusan interaktif untuk hero: GLB apa adanya; pratinjau tertutup/terbuka
+  // jadi poster (pengisi sebelum model siap, dan pengganti bila 3D tidak tersedia).
+  copyFileSync(src("kalili-interactive-steamer-3d/kalili-steamer/kalili-interactive-steamer.glb"), out("models", "kalili-steamer.glb"));
+  for (const state of ["closed", "open"]) {
+    await sharp(src(`kalili-interactive-steamer-3d/kalili-steamer/kalili-steamer-${state}.png`))
+      .trim().resize({ width: 1000 }).webp({ quality: 86, alphaQuality: 92 }).toFile(out("models", `steamer-${state}.webp`));
+  }
+  // Varian sajian untuk isi kukusan (hanya makanan, tanpa kukusan): dipakai apa adanya.
+  for (const variant of ["cheese-mentai", "black-series"]) {
+    copyFileSync(src(`kalili-menu-variants-3d/kalili-${variant}.glb`), out("models", `kalili-${variant}.glb`));
+  }
+
   dir("moments");
   for (const id of ["1140", "1180", "1205"]) {
     await sharp(src(`IMG_${id}.PNG`)).resize({ width: 880 }).webp({ quality: 80 }).toFile(out("moments", `img-${id}.webp`));

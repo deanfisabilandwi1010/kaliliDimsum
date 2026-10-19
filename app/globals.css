@@ -386,50 +386,275 @@ html[data-entered] .gate { display: none; }
 .hero {
   position: relative; min-height: 100svh;
   display: flex; flex-direction: column; justify-content: center;
-  padding: 120px var(--gutter) 150px;
-  background: var(--oxblood);
+  /* Jarak atas/bawah mengikuti tinggi layar: di layar pendek (atau zoom besar)
+     isi tetap muat di antara header dan baris pilihan sajian. */
+  padding: clamp(104px, 14svh, 120px) var(--gutter) clamp(116px, 15svh, 150px);
+  background: var(--wall);
   overflow: hidden; isolation: isolate;
 }
-.hero__media { position: absolute; inset: 0; z-index: -1; background: var(--wall); overflow: hidden; }
-.hero__poster, .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 100% 60%; }
-.hero__video { opacity: 0; transition: opacity 0.8s; }
-.hero__video[data-ready="true"] { opacity: 1; }
-/* Selubung tipis agar teks kiri tetap terbaca di atas dinding video. */
-.hero__media::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgb(244 229 200 / 0.62) 0%, rgb(244 229 200 / 0.3) 34%, transparent 56%);
+/* Latar studio: kolam cahaya di belakang kukusan, sisi kiri tempat teks lebih tenang. */
+.hero__media {
+  position: absolute; inset: 0; z-index: -1; overflow: hidden;
+  background:
+    linear-gradient(90deg, rgb(244 229 200 / 0.55) 0%, rgb(244 229 200 / 0) 46%),
+    radial-gradient(ellipse 48% 50% at 69% 56%, #fbf1dc 0, #f0e1c3 40%, var(--wall) 84%);
+}
+/* Panggung kukusan: poster dan kanvas 3D menempati kotak yang sama. */
+.hero__stage { position: absolute; inset: 0 0 0 36%; }
+.hero__poster {
+  position: absolute; inset: 16% 4% 12% 16%; width: 80%; height: 72%; object-fit: contain;
+  filter: drop-shadow(0 34px 36px rgb(60 30 10 / 0.24)); transform-origin: 50% 70%;
+  transition: opacity 0.7s;
+}
+/* Tanpa 3D: kukusan terbuka. Mode penuh, sebelum model siap: kukusan tertutup. */
+.hero__poster--closed { display: none; }
+html[data-motion="full"] .hero[data-live="false"]:not([data-failed]) .hero__poster--open { display: none; }
+html[data-motion="full"] .hero[data-live="false"]:not([data-failed]) .hero__poster--closed { display: block; }
+.hero[data-live="true"] .hero__poster { opacity: 0; }
+/* Kanvas selebar hero (bukan hanya panggung) agar model yang diputar tidak terpotong. */
+.hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.9s; }
+/* Lapis depan panggung: di atas kanvas, tembus klik kecuali elemen interaktifnya. */
+.hero__stage--front { pointer-events: none; }
+.hero__stage--front .hero__lantern, .hero__stage--front .hero__mascot { pointer-events: auto; }
+.hero[data-live="true"] .hero__canvas { opacity: 1; }
+.hero__canvas {
+  /* Geser mendatar memutar kukusan; gerak tegak tetap menggulir halaman. */
+  touch-action: pan-y; cursor: grab; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.hero__canvas[data-hover="true"] { cursor: pointer; }
+.hero__canvas[data-dragging] { cursor: grabbing; }
+
+/* ----- Dekor panggung: muncul saat kukusan dibuka ----- */
+/* Tertutup: semua dekor tersembunyi. Dibuka: portal tergambar, cincin melebar,
+   lampion turun berayun, Si Kali muncul, uap mengepul. Tanpa 3D (stage "open")
+   dekor tampil diam. */
+.hero__arch {
+  position: absolute; left: 44%; top: 8%; bottom: -2px; width: min(66svh, 78%); translate: -50% 0;
+  border: 1px solid rgb(199 137 40 / 0.5); border-bottom: 0; border-radius: 999px 999px 0 0;
+  background: linear-gradient(rgb(255 250 238 / 0.55), rgb(255 250 238 / 0) 64%);
+  clip-path: inset(0 0 0 0); pointer-events: none;
+  transition: clip-path 1.3s var(--ease-out) 0.25s, opacity 0.6s;
+}
+.hero__arch::after {
+  content: ""; position: absolute; inset: 14px 14px 0; border-radius: inherit;
+  border: 1px solid rgb(199 137 40 / 0.22); border-bottom: 0;
+}
+.hero__rings {
+  position: absolute; left: 44%; top: 71%; width: 74%; aspect-ratio: 3.2; translate: -50% -50%;
+  border-radius: 50%; border: 1px solid rgb(199 137 40 / 0.55); pointer-events: none;
+  transition: scale 1.1s var(--ease-out) 0.35s, opacity 0.6s 0.35s;
+}
+.hero__rings::after {
+  content: ""; position: absolute; inset: -16% -9%; border-radius: 50%;
+  border: 1px dashed rgb(199 137 40 / 0.3);
+}
+.hero__lantern {
+  position: absolute; top: -4%; width: clamp(64px, 7.4vw, 118px); height: auto;
+  transform-origin: 50% 0; cursor: pointer;
+  filter: drop-shadow(0 14px 16px rgb(60 30 10 / 0.25));
+  transition: translate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.55s, opacity 0.3s 0.55s;
+  animation: sway 6s ease-in-out infinite;
+}
+/* Di antara navigasi dan tombol pilihan, supaya tidak menutupi keduanya. */
+.hero__lantern--a { left: 47%; }
+.hero__lantern--b { left: 66%; top: -9%; width: clamp(48px, 5.4vw, 86px); transition-delay: 0.75s; animation-duration: 7.4s; animation-direction: reverse; }
+.hero__lantern[data-swing="a"] { animation: lantern-a 1.5s ease-out, sway 6s ease-in-out 1.5s infinite; }
+.hero__lantern[data-swing="b"] { animation: lantern-b 1.5s ease-out, sway 6s ease-in-out 1.5s infinite; }
+.hero__mascot {
+  position: absolute; right: 1%; bottom: 13%; width: clamp(120px, 14vw, 220px); height: auto;
+  transform-origin: 50% 100%; cursor: pointer;
+  filter: drop-shadow(0 16px 18px rgb(60 30 10 / 0.22));
+  transition: translate 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.1s, rotate 0.8s var(--ease-out) 1.1s, opacity 0.3s 1.1s;
+  animation: bob 4s ease-in-out infinite;
+}
+.hero__mascot[data-jump="a"] { animation: mascot-a 0.8s ease-out, bob 4s ease-in-out 0.8s infinite; }
+.hero__mascot[data-jump="b"] { animation: mascot-b 0.8s ease-out, bob 4s ease-in-out 0.8s infinite; }
+/* Percik emas: satu letupan saat tutup terangkat. */
+.hero__sparks { position: absolute; left: 41%; top: 52%; width: 62%; aspect-ratio: 1; translate: -50% -50%; pointer-events: none; }
+.hero__sparks i {
+  position: absolute; left: 50%; top: 50%; font-style: normal; font-size: clamp(14px, 1.5vw, 24px); color: var(--gold);
+  opacity: 0; text-shadow: 0 0 10px rgb(217 154 55 / 0.7);
+}
+/* Jeda tiap percik diisi lewat style inline. */
+.hero__sparks[data-on="true"] i { animation-name: spark; animation-duration: 1.3s; animation-timing-function: var(--ease-out); animation-fill-mode: both; }
+
+.hero[data-stage="closed"]:not([data-opened]) .hero__arch { clip-path: inset(100% 0 0 0); opacity: 0; transition: none; }
+.hero[data-stage="closed"]:not([data-opened]) .hero__rings { scale: 0.5; opacity: 0; transition: none; }
+.hero[data-stage="closed"]:not([data-opened]) .hero__lantern { translate: 0 -120%; opacity: 0; transition: none; }
+.hero[data-stage="closed"]:not([data-opened]) .hero__mascot { translate: 0 60%; rotate: 14deg; opacity: 0; transition: none; }
+
+@keyframes spark {
+  0% { opacity: 0; transform: rotate(var(--a)) translateX(0) scale(0.3); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(1.1); }
+}
+@keyframes lantern-a { 0% { rotate: 0deg; } 18% { rotate: 16deg; } 42% { rotate: -11deg; } 66% { rotate: 6deg; } 84% { rotate: -3deg; } 100% { rotate: -2.5deg; } }
+@keyframes lantern-b { 0% { rotate: 0deg; } 18% { rotate: -16deg; } 42% { rotate: 11deg; } 66% { rotate: -6deg; } 84% { rotate: 3deg; } 100% { rotate: -2.5deg; } }
+@keyframes mascot-a { 0% { translate: 0 0; } 35% { translate: 0 -22%; rotate: -6deg; } 70% { translate: 0 0; rotate: 3deg; } 100% { translate: 0 0; rotate: 0deg; } }
+@keyframes mascot-b { 0% { translate: 0 0; } 35% { translate: 0 -22%; rotate: 6deg; } 70% { translate: 0 0; rotate: -3deg; } 100% { translate: 0 0; rotate: 0deg; } }
+
+/* Petunjuk interaksi di bawah kukusan. */
+.hero__hint {
+  position: absolute; left: 44%; bottom: clamp(84px, 13svh, 120px); translate: -50% 0;
+  padding: 9px 18px; border-radius: 999px; white-space: nowrap; pointer-events: none;
+  background: rgb(255 246 227 / 0.78); color: var(--ink);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  opacity: 0; transition: opacity 0.6s;
+}
+.hero__hint[data-show="true"] { opacity: 1; }
+.hero__hint-touch { display: none; }
+@media (hover: none) {
+  .hero__hint-mouse { display: none; }
+  .hero__hint-touch { display: inline; }
 }
 
-.hero__content { max-width: min(720px, 54vw); }
+/* Kartu kecil yang muncul di siomay yang diklik. */
+.hero__card {
+  position: absolute; z-index: 2; width: 240px; translate: -50% calc(-100% - 22px);
+  display: grid; justify-items: start; gap: 6px; padding: 58px 18px 14px;
+  border-radius: 18px; background: var(--ivory); color: var(--ink);
+  box-shadow: 0 0 0 1px rgb(199 137 40 / 0.45), 0 24px 50px rgb(60 30 10 / 0.28);
+  animation: card-in 0.45s var(--ease-out);
+}
+.hero__card::after {
+  content: ""; position: absolute; left: 50%; bottom: -8px; width: 16px; height: 16px; translate: -50% 0; rotate: 45deg;
+  background: var(--ivory); box-shadow: 1px 1px 0 rgb(199 137 40 / 0.45);
+}
+.hero__card-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgb(37 25 21 / 0.62); }
+.hero__card-name {
+  font-family: var(--font-display), Georgia, serif; font-weight: 800; font-variation-settings: "SOFT" 100;
+  font-size: 30px; line-height: 1; color: var(--oxblood); margin-bottom: 8px;
+}
+.hero__card-add {
+  width: 100%; min-height: 44px; border: 0; border-radius: 999px;
+  background: var(--oxblood); color: var(--ivory); font-size: 14px; font-weight: 500;
+  transition: background-color 0.3s;
+}
+.hero__card-add:hover { background: var(--chili); }
+.hero__card-facts { margin: -4px 0 6px; font-size: 13px; color: var(--ink-soft); }
+.hero__card-add[disabled] { background: rgb(37 25 21 / 0.35); cursor: not-allowed; }
+.hero__card-add:focus-visible, .hero__card-link:focus-visible, .hero__card-close:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+/* Label nama saat kursor di atas satu siomay. */
+.hero__tag {
+  position: absolute; z-index: 2; translate: -50% calc(-100% - 12px); pointer-events: none; white-space: nowrap;
+  padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--ivory);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  animation: tag-in 0.25s var(--ease-out);
+}
+@keyframes tag-in { from { opacity: 0; translate: -50% calc(-100% - 4px); } }
+.hero__tag--cursor { translate: 14px calc(-100% - 10px); animation: none; }
+.hero__card-link { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; font-size: 14px; color: var(--oxblood); text-underline-offset: 5px; }
+.hero__card-close {
+  position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 36px; height: 36px;
+  border: 0; border-radius: 50%; background: none; color: var(--ink-soft);
+}
+@keyframes card-in { from { opacity: 0; transform: translateY(14px) scale(0.92); } }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(40px); } }
+
+/* Tirai transisi ke bagian yang jauh (lib/motion/curtain.ts): lampu padam
+   dengan cincin emas di tepi iris, nama tujuan sebentar di tengah. */
+.curtain { position: fixed; inset: 0; z-index: 150; pointer-events: none; }
+.curtain__veil {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, #2a1812 0, #150d0a 70%);
+}
+.curtain__ring {
+  position: absolute; translate: -50% -50%; border-radius: 50%;
+  border: 1.5px solid rgb(217 154 55 / 0.85);
+  box-shadow: 0 0 24px rgb(217 154 55 / 0.45), inset 0 0 24px rgb(217 154 55 / 0.25);
+}
+.curtain__label {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%; margin: 0;
+  display: grid; justify-items: center; gap: 12px; text-align: center; visibility: hidden;
+}
+.curtain__mark { font-size: 11px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold); }
+.curtain__name {
+  font-family: var(--font-display), Georgia, serif; font-weight: 800; font-variation-settings: "SOFT" 100;
+  font-size: clamp(30px, 4.2vw, 60px); line-height: 1; color: var(--ivory);
+}
+
+/* Transisi "menyelam" dari siomay hero ke bagian anatomi (lib/motion/dive.ts). */
+.dive { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
+.dive__veil { position: absolute; inset: 0; }
+.dive__veil--anatomy {
+  background:
+    linear-gradient(90deg, rgb(110 70 30 / 0.14), transparent 24%, transparent 80%, rgb(110 70 30 / 0.16)),
+    radial-gradient(ellipse 60% 70% at 67% 50%, #fbf1dc 0, #f0e1c3 40%, var(--table) 85%);
+}
+.dive__dish { position: absolute; object-fit: contain; filter: drop-shadow(0 30px 34px rgb(60 30 10 / 0.28)); will-change: transform; }
+/* Sajian yang meletup dari kukusan dan hinggap di atas kartu. */
+.hero__card-pop {
+  position: absolute; left: 50%; top: -64px; width: 112px; aspect-ratio: 1; margin-left: -56px; pointer-events: none;
+  animation: card-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.hero__card-pop img {
+  position: relative; width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 14px 14px rgb(60 30 10 / 0.3));
+  animation: pop-float 3.4s ease-in-out 0.9s infinite;
+}
+.hero__card-puff {
+  position: absolute; inset: -18%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 252 244 / 0.95), rgb(255 252 244 / 0.4) 55%, rgb(255 252 244 / 0));
+  filter: blur(6px); opacity: 0; animation: card-puff 1.1s ease-out 0.12s both;
+}
+@keyframes card-pop {
+  0% { opacity: 0; translate: 0 150%; scale: 0.15; rotate: -70deg; }
+  45% { opacity: 1; }
+  100% { translate: 0 0; scale: 1; rotate: 0deg; }
+}
+@keyframes card-puff { 0% { opacity: 0; scale: 0.4; } 30% { opacity: 1; } 100% { opacity: 0; scale: 1.6; } }
+@keyframes pop-float { 50% { translate: 0 -6px; rotate: 6deg; } }
+
+/* Balon celoteh Si Kali. */
+.hero__bubble {
+  position: absolute; right: calc(1% + clamp(120px, 14vw, 220px) * 0.62); bottom: calc(13% + clamp(120px, 14vw, 220px) * 0.86);
+  max-width: 210px; padding: 10px 14px; border-radius: 16px 16px 4px 16px; pointer-events: none;
+  background: var(--ivory); color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.35;
+  box-shadow: 0 0 0 1px rgb(199 137 40 / 0.45), 0 14px 30px rgb(60 30 10 / 0.2);
+  transform-origin: 100% 100%;
+  animation: bubble-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both, bubble-out 0.35s ease-in 2.8s forwards;
+}
+@keyframes bubble-in { from { opacity: 0; scale: 0.4; translate: 10px 10px; } }
+@keyframes bubble-out { to { opacity: 0; scale: 0.8; translate: 0 -8px; } }
+
+/* Lebar dibatasi supaya judul tidak pernah menimpa panggung kukusan di kanan. */
+.hero__content { max-width: min(640px, 40vw); }
 .hero__title {
-  margin: 22px 0 28px;
-  font-size: clamp(52px, 7.2vw, 112px); color: var(--oxblood);
+  margin: clamp(12px, 2.2svh, 22px) 0 clamp(14px, 2.8svh, 28px);
+  font-size: clamp(44px, min(7.2vw, 10.5svh), 112px); color: var(--oxblood);
 }
 .hero__line, .black__line, .order__line { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.14em; margin-bottom: -0.14em; }
 .hero__line > span, .black__line > span, .order__line > span { display: inline-block; }
 .hero__lede { max-width: 27em; font-size: clamp(17px, 1.35vw, 20px); color: var(--ink-soft); }
-.hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 40px; }
+.hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: clamp(20px, 4svh, 40px); }
+@media (min-width: 761px) and (max-height: 700px) {
+  .hero__lede { display: none; }
+}
 
 .hero__foot {
   position: absolute; left: var(--gutter); right: var(--gutter); bottom: 32px;
   display: flex; justify-content: space-between; align-items: flex-end; gap: 16px;
 }
+.hero__foot { justify-content: flex-start; align-items: center; }
+.hero__spot-label { flex: none; }
 .hero__spot { display: flex; gap: 10px; }
-.hero__spot a {
+.hero__spot a, .hero__spot button {
   display: flex; align-items: center; gap: 10px; min-height: 56px;
   padding: 4px 20px 4px 4px; border-radius: 999px;
   background: rgb(255 242 218 / 0.86); color: var(--ink);
   font-size: 14px; font-weight: 500; text-decoration: none;
   transition: background-color 0.3s, translate 0.4s var(--ease-out);
 }
-.hero__spot a:hover { background: var(--ivory); translate: 0 -3px; }
+.hero__spot button { border: 0; font-family: inherit; cursor: pointer; }
+.hero__spot a:hover, .hero__spot button:hover { background: var(--ivory); translate: 0 -3px; }
+.hero__spot button[aria-expanded="true"] { background: var(--ivory); box-shadow: 0 0 0 1.5px var(--gold); }
 .hero__spot img { width: 48px; height: 48px; transition: rotate 0.6s var(--ease-out); }
-.hero__spot a:hover img { rotate: 24deg; }
+.hero__spot a:hover img, .hero__spot button:hover img { rotate: 24deg; }
 
 /* Mode penuh: hero menempel selama 70svh sementara panggung menjadi portal. */
 html[data-motion="full"] .hero-pin { height: 260svh; }
 html[data-motion="full"] .hero { position: sticky; top: 0; height: 100svh; min-height: 0; }
-/* Pita merah dan bagian ritual naik menutupi hero yang masih menempel. */
+/* Pita merah naik menutupi hero yang masih menempel, disusul adegan siomay 3D. */
 html[data-motion="full"] .marquee {
   position: relative; z-index: 1; margin-top: -100svh;
   border-radius: clamp(22px, 3.4vw, 52px) clamp(22px, 3.4vw, 52px) 0 0;
@@ -440,16 +665,16 @@ html[data-motion="full"] .story { z-index: 1; }
 .hero__next { display: none; }
 html[data-motion="full"] .hero__next {
   display: block; position: absolute; left: var(--gutter); top: 50%; translate: 0 -50%;
-  max-width: min(640px, 52vw);
+  max-width: min(520px, 31vw);
 }
 .hero__next > * { visibility: hidden; }
 .hero__next-title {
   margin-top: 18px;
   font-family: var(--font-display), Georgia, serif; font-weight: 800; font-variation-settings: "SOFT" 100;
-  font-size: clamp(40px, 5.8vw, 92px); line-height: 0.98; letter-spacing: -0.025em; color: var(--oxblood);
+  font-size: clamp(36px, 4.6vw, 76px); line-height: 0.98; letter-spacing: -0.025em; color: var(--oxblood);
 }
 .hero__shade { position: absolute; inset: 0; z-index: 1; background: var(--ink); opacity: 0; pointer-events: none; }
-.hero__poster, .hero__video { transform-origin: 80% 78%; }
+.hero .btn[disabled] { opacity: 0.7; cursor: default; }
 
 /* ---------- Pita merek ---------- */
 
@@ -487,8 +712,23 @@ html[data-motion="full"] .hero__next {
 .beat .btn { margin-top: 28px; }
 .story__rail { display: none; }
 
-html[data-motion="full"] .story { height: 400svh; }
+/* 400svh cerita + 120svh ekor serah-terima ke menu (lib/motion/handoff.ts).
+   Ritual naik seperti tirai menutupi adegan siomay 3D yang masih menempel. */
+html[data-motion="full"] .story {
+  height: 520svh; margin-top: -100svh;
+  clip-path: inset(0 round clamp(22px, 3.4vw, 52px) clamp(22px, 3.4vw, 52px) 0 0);
+}
 html[data-motion="full"] .story__sticky { position: sticky; top: 0; height: 100svh; }
+.story__night { display: none; }
+html[data-motion="full"] .story__night {
+  --hole: 120%; --ix: 62%; --iy: 52%;
+  display: block; position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  /* Warna sama dengan latar panggung menu; lubangnya menyisakan sorot kecil. */
+  background: radial-gradient(circle at var(--ix) var(--iy), rgb(21 13 10 / 0) var(--hole), #150d0a calc(var(--hole) + 14%));
+}
+@media (max-aspect-ratio: 1/1), (max-width: 760px) {
+  html[data-motion="full"] .story__night { --ix: 50%; --iy: 43%; }
+}
 html[data-motion="full"] .story__poster { display: none; }
 html[data-motion="full"] .story__beats > * { grid-area: 1 / 1; }
 html[data-motion="full"] .story__beats { align-items: start; min-height: 300px; }
@@ -514,7 +754,7 @@ html[data-motion="full"] .story__rail {
 
 .anatomy {
   position: relative;
-  /* Tepi atas = warna meja frame terakhir ritual, tepi bawah = awal menu.
+  /* Latar meja hangat, menyambung dari pita merah di atasnya.
      Di tengah: kolam cahaya studio; di sisi kiri-kanan: sedikit lebih gelap. */
   background:
     linear-gradient(90deg, rgb(110 70 30 / 0.14), transparent 24%, transparent 80%, rgb(110 70 30 / 0.16)),
@@ -545,8 +785,8 @@ html[data-motion="full"] .story__rail {
 .anatomy__bar { display: none; }
 
 /* ----- Mode penuh ----- */
-/* 460svh cerita + 120svh ekor serah-terima ke panggung menu (lib/motion/handoff.ts). */
-html[data-motion="full"] .anatomy { height: 580svh; }
+/* 460svh cerita + 100svh ekor tempat tirai ritual naik (lib/motion/handoff.ts). */
+html[data-motion="full"] .anatomy { height: 560svh; }
 .anatomy__night { display: none; }
 html[data-motion="full"] .anatomy__night {
   display: block; position: absolute; inset: 0; opacity: 0; pointer-events: none;
@@ -816,10 +1056,61 @@ html[data-motion="full"] .anatomy[data-live="true"] .anatomy__explore { display:
 @keyframes stamp { from { scale: 1.8; opacity: 0; } }
 .menu__spot { display: none; }
 
+/* ----- Menyajikan: sajian diklik atau ditambahkan ----- */
+/* Pembungkus sajian menerima lompatan; gambarnya sendiri diputar GSAP oleh
+   scroll, jadi keduanya tidak berebut transform. */
+.card__dish { position: absolute; inset: 0; display: grid; place-items: center; transform-origin: 50% 70%; }
+.card__ring, .card__steam { position: absolute; pointer-events: none; }
+.card__ring {
+  left: 15%; right: 15%; top: 62%; aspect-ratio: 3.2; border-radius: 50%; opacity: 0;
+  border: 2px solid var(--gold); box-shadow: 0 0 18px rgb(217 154 55 / 0.55), inset 0 0 12px rgb(217 154 55 / 0.4);
+}
+.card__ring::after { content: ""; position: absolute; inset: -18% -8%; border-radius: inherit; border: 1px solid rgb(217 154 55 / 0.6); }
+.card__steam { inset: 0 18% 40%; }
+.card__steam i {
+  position: absolute; bottom: 0; width: 34%; aspect-ratio: 1; border-radius: 50%; opacity: 0;
+  background: radial-gradient(closest-side, rgb(255 251 242 / 0.85), rgb(255 251 242 / 0.35) 55%, rgb(255 251 242 / 0));
+  filter: blur(7px);
+}
+.card__steam i:nth-child(1) { left: 8%; animation-delay: 0.32s; }
+.card__steam i:nth-child(2) { left: 33%; animation-delay: 0.42s; }
+.card__steam i:nth-child(3) { left: 58%; animation-delay: 0.5s; }
+.card__steam i:nth-child(4) { left: 20%; animation-delay: 0.66s; }
+.card__steam i:nth-child(5) { left: 46%; animation-delay: 0.8s; }
+html[data-motion="full"] .card__stage { cursor: pointer; }
+html[data-motion="full"] .card[data-serve] .card__dish { animation: dish-serve 1s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
+html[data-motion="full"] .card[data-serve] .card__ring { animation: ring-serve 0.9s var(--ease-out) 0.62s both; }
+html[data-motion="full"] .card[data-serve] .card__steam i { animation-name: puff-serve; animation-duration: 1.9s; animation-timing-function: cubic-bezier(0.2, 0.6, 0.35, 1); animation-fill-mode: both; }
+html[data-motion="full"] .card[data-serve] .card__picked { animation: stamp 0.35s var(--ease-out) 0.7s both; }
+@keyframes dish-serve {
+  0% { translate: 0 0; scale: 1; rotate: 0deg; }
+  16% { translate: 0 4%; scale: 1.07 0.9; rotate: 0deg; }
+  46% { translate: 0 -17%; scale: 0.95 1.06; rotate: 220deg; }
+  66% { translate: 0 0; scale: 1.1 0.9; rotate: 360deg; }
+  82% { translate: 0 -2%; scale: 0.97 1.03; rotate: 360deg; }
+  100% { translate: 0 0; scale: 1; rotate: 360deg; }
+}
+@keyframes ring-serve { 0% { opacity: 1; scale: 0.45; } 100% { opacity: 0; scale: 1.55; } }
+@keyframes puff-serve {
+  0% { opacity: 0; translate: 0 30%; scale: 0.5; }
+  22% { opacity: 0.8; }
+  100% { opacity: 0; translate: 6% -150%; scale: 1.9; }
+}
+
+/* Salinan sajian yang terbang ke kukusan atau ke tombol Pilihanmu. */
+.fly {
+  position: fixed; z-index: 200; margin: 0; pointer-events: none; object-fit: contain;
+  filter: drop-shadow(0 14px 16px rgb(40 20 8 / 0.35)); will-change: transform;
+}
+.header__cart[data-bump="a"] { animation: cart-a 0.7s var(--ease-out); }
+.header__cart[data-bump="b"] { animation: cart-b 0.7s var(--ease-out); }
+@keyframes cart-a { 0% { scale: 1; } 25% { scale: 1.2 0.88; } 50% { scale: 0.92 1.08; } 75% { scale: 1.05; } 100% { scale: 1; } }
+@keyframes cart-b { 0% { scale: 1; } 25% { scale: 1.2 0.88; } 50% { scale: 0.92 1.08; } 75% { scale: 1.05; } 100% { scale: 1; } }
+
 /* Mode penuh: panggung gelap bergaya layar pilih karakter. Section menempel,
    lampu padam (--night 0→1), deretan menu bergeser ke samping melewati sorot
    lampu di tengah; --f per kartu = seberapa dalam ia berada di bawah sorot. */
-/* Section menu mulai tepat di awal ekor serah-terima adegan siomay 3D:
+/* Section menu mulai tepat di awal ekor serah-terima ritual kukusan:
    naik 100svh (layar yang masih ditempati adegan itu) + 120svh (ekornya), jadi
    kedua panggung menempel bersamaan. Latar section tembus pandang di bagian
    itu supaya adegan di bawahnya terlihat. */
@@ -1208,24 +1499,53 @@ html[data-motion="full"] .order__lantern--b { animation-duration: 7.5s; animatio
   .hero__content { max-width: none; }
   /* Portrait: video tidak di-cover (kukusan akan terpotong), tetapi ditambatkan
      di bawah dan dileburkan ke warna dinding video. */
-  .hero { padding-top: 96px; padding-bottom: 26svh; }
+  /* Portrait: komposisi lebih sederhana. Teks di atas, kukusan mengisi paruh bawah. */
+  .hero { padding-top: 92px; padding-bottom: 50svh; }
   html[data-motion="full"] .hero__next { top: 104px; translate: none; max-width: none; right: var(--gutter); }
-  .hero__poster, .hero__video { transform-origin: 62% 82%; }
-  .hero__media { background: #ceb28a; }
-  .hero__title { margin: 14px 0 18px; font-size: clamp(40px, 13vw, 72px); }
-  .hero__lede { font-size: 16px; }
-  .hero__poster, .hero__video {
-    inset: auto 0 0 auto; width: 188%; max-width: none; height: auto; aspect-ratio: 16 / 9;
-    -webkit-mask-image: linear-gradient(transparent, #000 30%);
-    mask-image: linear-gradient(transparent, #000 30%);
+  .hero__media {
+    background: radial-gradient(ellipse 86% 40% at 50% 72%, #fbf1dc 0, #f0e1c3 44%, var(--wall) 88%);
   }
-  .hero__media::after {
-    background: linear-gradient(180deg, rgb(244 229 200 / 0.8) 0%, rgb(244 229 200 / 0.5) 45%, transparent 75%);
+  .hero__stage { inset: auto 0 0 0; height: 52svh; }
+  .hero__poster { inset: 6% 4% 14%; width: 92%; height: 80%; }
+  .hero__arch { left: 50%; top: 2%; width: min(46svh, 88%); }
+  .hero__rings { left: 50%; top: 66%; width: 92%; }
+  .hero__sparks { left: 46%; top: 46%; width: 88%; }
+  /* Lampion diturunkan ke samping kukusan supaya tidak menimpa tombol di atasnya. */
+  .hero__lantern--a { left: 2%; top: 16%; width: 48px; }
+  .hero__lantern--b { left: auto; right: 3%; top: 12%; width: 38px; }
+  .hero__mascot { right: 0; bottom: 64px; width: 92px; }
+  .hero__hint { left: 50%; bottom: 66px; font-size: 10px; padding: 7px 14px; }
+  /* Kartu produk = bottom sheet: tidak pernah menimpa judul, tombol, atau kukusan. */
+  .hero__card {
+    position: fixed; left: 12px !important; right: 12px; top: auto !important; bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 120; width: auto; translate: none; min-height: 132px; align-content: center;
+    padding: 16px 52px 12px 112px; border-radius: 22px;
+    box-shadow: 0 0 0 1px rgb(199 137 40 / 0.45), 0 -10px 40px rgb(60 30 10 / 0.25);
+    animation: sheet-in 0.45s var(--ease-out);
   }
+  .hero__card::after { display: none; }
+  /* Sheet menempati dasar layar: baris pilihan sajian minggir sementara. */
+  .hero__foot-wrap { transition: opacity 0.25s; }
+  .hero[data-card] .hero__foot-wrap { opacity: 0; pointer-events: none; }
+  .hero__card-pop { left: 14px; top: 50%; width: 86px; margin: -43px 0 0; }
+  .hero__card-link { min-height: 36px; }
+  .hero__bubble { right: 58px; bottom: 150px; max-width: 170px; font-size: 12px; }
+  .hero__card-name { font-size: 26px; }
+  .hero__title { margin: 12px 0 14px; font-size: clamp(38px, 12.4vw, 68px); }
+  .hero__lede { display: none; }
+  /* Label tombol diringkas agar muat satu baris; nama aksesibelnya tetap lengkap. */
+  .hero__long { display: none; }
   .hero__cta { margin-top: 22px; gap: 4px; flex-wrap: nowrap; }
   .hero__cta .btn { min-height: 50px; gap: 14px; padding-inline: 22px; }
-  .hero__cta .btn--ghost { padding-inline: 12px; }
-  .hero__spot { display: none; }
+  .hero__cta .btn--ghost { padding-inline: 10px; gap: 8px; }
+  .hero__foot { bottom: 14px; gap: 10px; }
+  .hero__spot-label { display: none; }
+  /* Satu baris yang bisa digeser; label tidak pernah terlipat dua baris. */
+  .hero__spot { min-width: 0; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-right: calc(var(--gutter) * -1); padding-right: var(--gutter); }
+  .hero__spot::-webkit-scrollbar { display: none; }
+  .hero__spot li { flex: none; }
+  .hero__spot a, .hero__spot button { min-height: 44px; padding: 0 14px; font-size: 13px; white-space: nowrap; }
+  .hero__spot img { display: none; }
 
   .gate__screen { background: linear-gradient(#d5c0a2 50%, #e2d0b4 50%); }
   .gate__video {

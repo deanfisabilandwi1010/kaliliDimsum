@@ -3,9 +3,29 @@
 import { useEffect, useRef } from "react";
 import { formatIDR, products, type Product } from "@/content/products";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { curtainTo } from "@/lib/motion/curtain";
+import { ARRIVE } from "@/lib/motion/dive";
+import { flyToCart, GOTO_CARD } from "@/lib/motion/fly";
+import { glide } from "@/lib/motion/glide";
 import { HANDOFF } from "@/lib/motion/handoff";
 import { useExperience } from "./Experience";
 import { Arrow, ProductImage } from "./ui";
+
+/**
+ * Sajikan kartu: sajian melompat dan berputar, uap mengepul, cincin emas
+ * melebar. Atribut a/b bergantian agar animasi CSS-nya diputar ulang.
+ */
+export function serve(card: Element | null | undefined) {
+  if (!(card instanceof HTMLElement)) return;
+  // Lepas lalu pasang lagi (dengan reflow di antaranya) agar animasi CSS-nya
+  // selalu diputar ulang dari awal, juga saat diklik beruntun.
+  delete card.dataset.serve;
+  void card.offsetWidth;
+  card.dataset.serve = "true";
+  // Sajian di bawah sorot: podium ikut berdenyut.
+  const spot = card.closest(".menu__pin")?.querySelector<HTMLElement>(".menu__spot");
+  if (spot && card.hasAttribute("data-active")) spot.dataset.hit = spot.dataset.hit === "a" ? "b" : "a";
+}
 
 function AddButton({ product }: { product: Product }) {
   const { selection, toggle } = useExperience();
@@ -16,7 +36,15 @@ function AddButton({ product }: { product: Product }) {
       type="button"
       aria-pressed={selected}
       aria-label={selected ? `Hapus ${product.name} dari pilihan` : `Tambah ${product.name} ke pilihan`}
-      onClick={() => toggle(product.id)}
+      onClick={(e) => {
+        // Saat ditambahkan, sajian disajikan lalu salinannya terbang ke "Pilihanmu".
+        if (!selected) {
+          const card = e.currentTarget.closest(".card");
+          serve(card);
+          flyToCart(card?.querySelector<HTMLImageElement>(".card__dish img"));
+        }
+        toggle(product.id);
+      }}
     >
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
         <path className="add__h" d="M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -74,7 +102,7 @@ export function MenuSection() {
     // 1 px scroll = 1 px geser. Setelah deretan habis, menu tetap menempel satu
     // layar lagi (hold) sementara panel Black Series naik menutupinya.
     const hold = () => pin.offsetHeight;
-    // Bagian awal section menumpuk di atas akhir adegan siomay 3D (serah-terima):
+    // Bagian awal section menumpuk di atas akhir ritual kukusan (serah-terima):
     // selama itu panggung menu sudah menempel tetapi baru muncul perlahan, dan
     // deretan menu belum bergeser.
     const tail = () => pin.offsetHeight * HANDOFF;
@@ -137,8 +165,8 @@ export function MenuSection() {
         onUpdate: light,
         scrollTrigger: { ...range, scrub: 0.5, invalidateOnRefresh: true },
       });
-      // Panggung selalu gelap di mode ini; kegelapannya datang dari adegan siomay
-      // yang meredup lebih dulu. Panggung lalu muncul di tempat: sorot dan
+      // Panggung selalu gelap di mode ini; kegelapannya datang dari iris ritual
+      // yang menutup lebih dulu. Panggung lalu muncul di tempat: sorot dan
       // kukusan pertama dulu, judul dan garis progres menyusul.
       gsap.set(pin, { "--night": 1 });
       pin.style.pointerEvents = "none";
@@ -173,19 +201,46 @@ export function MenuSection() {
     }, root);
 
     // Tautan #menu-<id> harus mendarat di kartu yang benar di dalam deretan.
-    const toCard = (card: HTMLElement, behavior: ScrollBehavior) => {
+    const cardTop = (card: HTMLElement) => {
       const top = root.getBoundingClientRect().top + window.scrollY;
       const x = card.offsetLeft - (pin.clientWidth - card.offsetWidth) / 2;
-      window.scrollTo({ top: top + tail() + Math.min(distance(), Math.max(0, x)), behavior });
+      return top + tail() + Math.min(distance(), Math.max(0, x));
+    };
+    const toCard = (card: HTMLElement, behavior: ScrollBehavior) => window.scrollTo({ top: cardTop(card), behavior });
+    // Ke kartu lalu menyajikannya begitu berhenti di bawah sorot. Dekat:
+    // meluncur. Jauh (mis. dari hero): tirai transisi, tanpa menggulir melewati
+    // bagian di antaranya.
+    const goTo = (card: HTMLElement, origin?: { x: number; y: number }) => {
+      const top = cardTop(card);
+      if (Math.abs(top - window.scrollY) < window.innerHeight * 2.5) return glide(top, { onDone: () => serve(card) });
+      curtainTo({
+        top,
+        origin: origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+        label: card.querySelector(".card__name")?.textContent ?? "",
+        onDone: () => serve(card),
+      });
+    };
+    // Tiba lewat tirai (tautan "Menu" / "Lihat Menu"): sajian di bawah sorot disajikan.
+    const onArrive = (e: Event) => {
+      if ((e as CustomEvent<string>).detail !== "menu") return;
+      window.setTimeout(() => serve(track.querySelector("[data-active]") ?? items[0]), 350);
     };
     const cardFor = (hash: string) => (hash.startsWith("#menu-") ? track.querySelector<HTMLElement>(`[id="${hash.slice(1)}"]`) : null);
     const onClick = (e: MouseEvent) => {
+      // Tautan yang sudah ditangani sendiri (mis. pilihan sajian di hero) dilewati.
+      if (e.defaultPrevented) return;
       const link = (e.target as Element).closest?.<HTMLAnchorElement>('a[href^="#menu-"]');
       const card = link && cardFor(link.hash);
       if (!card) return;
       e.preventDefault();
       history.replaceState(null, "", link.hash);
-      toCard(card, "smooth");
+      goTo(card, e.detail === 0 ? undefined : { x: e.clientX, y: e.clientY });
+    };
+    const onGoto = (e: Event) => {
+      const card = cardFor(`#menu-${(e as CustomEvent<string>).detail}`);
+      if (!card) return;
+      history.replaceState(null, "", `#${card.id}`);
+      goTo(card);
     };
     // Fokus keyboard ke kartu di luar layar: geser halaman, bukan kontainernya.
     const onFocus = (e: FocusEvent) => {
@@ -199,6 +254,8 @@ export function MenuSection() {
       if (card) toCard(card, "instant");
     };
     document.addEventListener("click", onClick);
+    window.addEventListener(GOTO_CARD, onGoto);
+    window.addEventListener(ARRIVE, onArrive);
     window.addEventListener("hashchange", onHash);
     track.addEventListener("focusin", onFocus);
     // Tinggi section baru saja berubah: trigger lain harus menghitung ulang posisi.
@@ -222,6 +279,8 @@ export function MenuSection() {
         el.removeAttribute("data-active");
       });
       document.removeEventListener("click", onClick);
+      window.removeEventListener(GOTO_CARD, onGoto);
+      window.removeEventListener(ARRIVE, onArrive);
       window.removeEventListener("hashchange", onHash);
       track.removeEventListener("focusin", onFocus);
       ctx.revert();
@@ -258,10 +317,16 @@ export function MenuSection() {
         <ul ref={trackRef} className="menu__track">
           {products.map((p, i) => (
             <li className="card" id={`menu-${p.id}`} key={p.id}>
-              <div className="card__stage" onPointerMove={tilt} onPointerLeave={untilt}>
+              {/* Mengeklik sajian = menyajikannya (lompat, putar, uap). Hanya hiasan;
+                  aksi sebenarnya tetap tombol + di bawahnya. */}
+              <div className="card__stage" onPointerMove={tilt} onPointerLeave={untilt} onClick={(e) => serve(e.currentTarget.closest(".card"))}>
                 <span className="card__no" aria-hidden="true">{pad(i + 1)}</span>
                 {selection[p.id] ? <span className="card__picked" aria-hidden="true">Dipilih</span> : null}
-                <ProductImage image={p.image} alt={p.alt} sizes="(max-width: 760px) 70vw, 30vw" />
+                <span className="card__ring" aria-hidden="true" />
+                <span className="card__dish">
+                  <ProductImage image={p.image} alt={p.alt} sizes="(max-width: 760px) 70vw, 30vw" />
+                </span>
+                <span className="card__steam" aria-hidden="true"><i /><i /><i /><i /><i /></span>
               </div>
               <div className="card__row">
                 <div>

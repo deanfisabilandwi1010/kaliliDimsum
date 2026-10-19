@@ -1,0 +1,124 @@
+{
+  "file_bytes": 4131324,
+  "hierarchy_verified": true,
+  "default_closed_pose_verified": true,
+  "nodes": {
+    "brand_badge": {
+      "triangles": 216,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "carrot_mix": {
+      "triangles": 1378,
+      "parent": "dimsum_hero_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "carrot_topping": {
+      "triangles": 4656,
+      "parent": "dimsum_hero_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "meat_filling": {
+      "triangles": 7790,
+      "parent": "dimsum_hero_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "vegetable_pieces": {
+      "triangles": 1156,
+      "parent": "dimsum_hero_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "wrapper_shell": {
+      "triangles": 10226,
+      "parent": "dimsum_hero_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "dimsum_support_01": {
+      "triangles": 4118,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "dimsum_support_02": {
+      "triangles": 4118,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "dimsum_support_03": {
+      "triangles": 4118,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "dimsum_support_04": {
+      "triangles": 4118,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "steamer_base": {
+      "triangles": 12776,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    },
+    "steamer_lid": {
+      "triangles": 14436,
+      "parent": "kalili_steamer_root",
+      "nonmanifold_edges_after_seam_weld": 0
+    }
+  },
+  "triangles_in_scene": 69106,
+  "clips": {
+    "entrance_open": {
+      "duration": 2.4000000953674316,
+      "targets": [
+        "steamer_lid"
+      ],
+      "paths": [
+        "rotation",
+        "translation"
+      ]
+    },
+    "hero_lift": {
+      "duration": 1.0,
+      "targets": [
+        "dimsum_hero_root"
+      ],
+      "paths": [
+        "translation"
+      ]
+    },
+    "ingredients_cycle": {
+      "duration": 8.0,
+      "targets": [
+        "carrot_mix",
+        "carrot_topping",
+        "meat_filling",
+        "vegetable_pieces",
+        "wrapper_shell"
+      ],
+      "paths": [
+        "translation"
+      ]
+    }
+  },
+  "collision_sampling": {
+    "entrance_open": {
+      "samples": 19,
+      "maximum_external_triangle_intersections": 0
+    },
+    "hero_lift": {
+      "samples": 11,
+      "maximum_external_triangle_intersections": 0
+    },
+    "ingredients_cycle": {
+      "samples": 13,
+      "maximum_external_triangle_intersections": 0
+    }
+  },
+  "textures_embedded": true,
+  "reassembly_max_matrix_error": 0.0,
+  "lid_moves_independently": true,
+  "hero_moves_without_basket": true,
+  "hero_ingredients_independent": true,
+  "collision_records": [],
+  "steam_geometry_present": false,
+  "shared_support_mesh_resources": 1
+}

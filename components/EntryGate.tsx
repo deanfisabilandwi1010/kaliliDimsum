@@ -20,7 +20,7 @@ function preloadList() {
   const frames = window.innerWidth <= 900 ? "m" : "d";
   const images = [
     "/retro/steamer.webp",
-    "/video/hero-poster.jpg",
+    "/models/steamer-closed.webp",
     "/video/intro-poster.jpg",
     `/frames/story/${frames}/0001.webp`,
     ...(brand.logo ? [brand.logo] : []),

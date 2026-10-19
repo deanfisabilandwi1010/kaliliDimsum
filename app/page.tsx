@@ -20,8 +20,8 @@ export default function Page() {
       <main id="main" tabIndex={-1}>
         <HeroStage />
         <Marquee />
-        <SteamStory />
         <DimsumAnatomy />
+        <SteamStory />
         <MenuSection />
         <BlackSeriesFeature />
         <KaliliMoments />

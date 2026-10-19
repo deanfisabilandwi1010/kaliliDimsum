@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/motion/gsap";
+import { HANDOFF } from "@/lib/motion/handoff";
 import { useExperience } from "./Experience";
 import { Arrow } from "./ui";
 import { lastFrame, useSequence } from "./useSequence";
@@ -36,13 +37,18 @@ export function SteamStory() {
       const state = { frame: 0, zoom: portrait ? 0.9 : 1 };
       const render = () => seqRef.current?.setProgress(state.frame, state.zoom);
       gsap.set(beats.slice(1), { autoAlpha: 0, y: 40 });
+      // Section = cerita utama + ekor serah-terima ke panggung menu.
+      const sticky = root.querySelector<HTMLElement>(".story__sticky")!;
+      const tail = () => sticky.offsetHeight * HANDOFF;
+      const mainSpan = () => root.offsetHeight - sticky.offsetHeight - tail();
 
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: "bottom bottom",
+          end: () => `+=${mainSpan()}`,
+          invalidateOnRefresh: true,
           scrub: 0.6,
           onUpdate: (self) => {
             const step = RANGES.findLastIndex(([start]) => self.progress >= start - 0.03);
@@ -60,6 +66,28 @@ export function SteamStory() {
       });
       tl.fromTo(".story__rail-fill", { "--p": 0 }, { "--p": 1, duration: 1 }, 0);
       tl.set({}, {}, 1);
+
+      // ---------- Serah-terima ke panggung menu ----------
+      // Lampu ruangan padam seperti iris yang menutup ke arah kukusan, sementara
+      // kamera terus mendekat. Panggung menu (MenuSection) lalu muncul di tempat
+      // dengan sorot lampunya sendiri di titik yang sama.
+      const iris = { hole: 120 };
+      const night = root.querySelector<HTMLElement>(".story__night")!;
+      gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: root, start: () => `top+=${mainSpan()} top`, end: "bottom bottom", scrub: 0.4, invalidateOnRefresh: true },
+      })
+        // Yang digeser elemen-elemennya, bukan .story__copy: transform pada
+        // kotak itu menjadikannya acuan posisi label & teks beat yang di
+        // mobile diletakkan absolut terhadap layar, sehingga semuanya bergeser.
+        .to(".story__copy > .eyebrow, .story__beats, .story__rail", { autoAlpha: 0, y: -30, duration: 0.2, ease: "power1.in" }, 0)
+        .fromTo(iris, { hole: 120 }, {
+          hole: 0, duration: 0.5, ease: "power2.inOut",
+          onUpdate: () => night.style.setProperty("--hole", `${iris.hole}%`),
+        }, 0.04)
+        .fromTo(night, { opacity: 0 }, { opacity: 1, duration: 0.12 }, 0.02)
+        .fromTo(state, { zoom: portrait ? 1.1 : 1.05 }, { zoom: portrait ? 1.24 : 1.18, duration: 0.56, ease: "power1.in", onUpdate: render, immediateRender: false }, 0)
+        .set({}, {}, 1);
     }, root);
     return () => ctx.revert();
   }, [motion, seqRef]);
@@ -70,6 +98,7 @@ export function SteamStory() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="story__poster" src={lastFrame("story")} alt="Kukusan bambu terbuka dengan lima siomay terangkat di antara uap" width={1280} height={720} loading="lazy" />
         {motion && <canvas ref={canvasRef} className="story__canvas" aria-hidden="true" />}
+        <span className="story__night" aria-hidden="true" />
 
         <div className="story__copy">
           <p className="eyebrow">01 / Ritual kecil Kalili</p>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ARRIVE } from "@/lib/motion/dive";
 import { gsap } from "@/lib/motion/gsap";
-import { HANDOFF } from "@/lib/motion/handoff";
+import { CURTAIN } from "@/lib/motion/handoff";
 import type { DimsumScene } from "@/lib/three/dimsum-scene";
 import { useExperience } from "./Experience";
 import { Arrow, SteamCurl } from "./ui";
@@ -111,10 +112,10 @@ export function DimsumAnatomy() {
           .to(phases[to], { autoAlpha: 1, y: 0, duration: 0.04, ease: "power2.out" }, at + 0.03)
           .to(ghosts[to], { autoAlpha: 1, duration: 0.06 }, at + 0.02);
 
-      // Section = cerita utama + ekor serah-terima ke panggung menu.
+      // Section = cerita utama + ekor tempat tirai ritual naik menutupinya.
       const pin = root.querySelector<HTMLElement>(".anatomy__pin")!;
       const stage = root.querySelector<HTMLElement>(".anatomy__stage")!;
-      const tail = () => pin.offsetHeight * HANDOFF;
+      const tail = () => pin.offsetHeight * CURTAIN;
       const mainSpan = () => root.offsetHeight - pin.offsetHeight - tail();
 
       const tl = gsap.timeline({
@@ -146,45 +147,45 @@ export function DimsumAnatomy() {
       // Kata besar bergeser pelan ke samping sepanjang cerita.
       tl.fromTo(".anatomy__ghost", { xPercent: 5 }, { xPercent: -5, duration: 1 }, 0);
 
-      // ---------- Serah-terima ke panggung menu ----------
-      // Lampu ruangan padam di adegan yang sama, lalu siomay meluncur ke titik
-      // sorot panggung menu dan mengecil seukuran satu siomay di dalam kukusan
-      // pertama. Panggung menu (MenuSection) muncul di tempat di sekelilingnya.
-      // Pusat siomay utuh selalu tepat di tengah kanvas (titik bidik kamera),
-      // dan lebarnya di layar mengikuti bingkai kamera pose utuh.
-      const landing = () => {
-        const width = stage.offsetWidth;
-        const height = stage.offsetHeight;
-        const modelWidth = Math.min(0.536 * height, 0.4615 * width);
-        const track = document.querySelector<HTMLElement>(".menu__track");
-        const first = track?.querySelector<HTMLElement>(".card__stage");
-        if (!track || !first) return { x: 0, y: 0, scale: 0.4 };
-        return {
-          x: pin.offsetWidth / 2 - (stage.offsetLeft + width / 2),
-          y: track.offsetTop + first.offsetTop + first.offsetHeight / 2 - (stage.offsetTop + height / 2),
-          scale: (first.offsetWidth * 0.27) / modelWidth,
-        };
-      };
+      // ---------- Tirai ritual ----------
+      // Bagian ritual naik menutupi adegan ini dari bawah. Selama itu adegan
+      // tetap menempel, mundur sedikit, dan meredup supaya tirai terasa di depan.
       gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
           trigger: root, start: () => `top+=${mainSpan()} top`, end: "bottom bottom", scrub: 0.4, invalidateOnRefresh: true,
-          // Bahan yang sedang difokuskan dilepas begitu serah-terima dimulai.
+          // Bahan yang sedang difokuskan dilepas begitu tirai mulai naik.
           onEnter: () => {
             sceneRef.current?.focus(null);
             setPicked(null);
           },
         },
       })
-        .to(".anatomy__copy", { autoAlpha: 0, y: -30, duration: 0.18, ease: "power1.in" }, 0)
-        .to(".anatomy__arch, .anatomy__ghost, .anatomy__steam, .anatomy__dust, .anatomy__hint", { autoAlpha: 0, duration: 0.2 }, 0)
-        .fromTo(".anatomy__night", { opacity: 0 }, { opacity: 1, duration: 0.32, ease: "power1.inOut" }, 0.02)
-        .to(stage, { x: () => landing().x, y: () => landing().y, scale: () => landing().scale, duration: 0.56, ease: "power2.inOut" }, 0.06)
-        .to(".anatomy__shadow", { autoAlpha: 0, duration: 0.2 }, 0.32)
-        .to(stage, { autoAlpha: 0, duration: 0.24, ease: "power1.in" }, 0.66)
-        .set({}, {}, 1);
+        // Kotaknya hanya memudar; yang bergeser anak-anaknya. Transform pada
+        // .anatomy__copy akan mengganti acuan posisi isinya dan menelan
+        // `translate` CSS-nya di desktop.
+        .to(".anatomy__copy", { autoAlpha: 0, duration: 0.5, ease: "power1.in" }, 0)
+        .to(".anatomy__copy > *", { y: -40, duration: 0.5, ease: "power1.in" }, 0)
+        .to(".anatomy__hint", { autoAlpha: 0, duration: 0.3 }, 0)
+        .to(stage, { scale: 0.9, yPercent: -6, duration: 1 }, 0)
+        .fromTo(".anatomy__night", { opacity: 0 }, { opacity: 0.55, duration: 1, ease: "power1.in" }, 0);
     }, root);
     return () => ctx.revert();
+  }, [motion]);
+
+  // Tiba dari "Kenali Isinya" di hero: siomay berputar menyambut, teks naik
+  // satu per satu begitu tirai transisi memudar.
+  useEffect(() => {
+    if (!motion) return;
+    const onArrive = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== "anatomi") return;
+      sceneRef.current?.nudge(0.16);
+      gsap.from(rootRef.current!.querySelectorAll(".anatomy__copy > .eyebrow, .anatomy__title, .anatomy__phases, .anatomy__explore"), {
+        y: 34, autoAlpha: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, clearProps: "transform",
+      });
+    };
+    window.addEventListener(ARRIVE, onArrive);
+    return () => window.removeEventListener(ARRIVE, onArrive);
   }, [motion]);
 
   const choose = (node: string | null) => {

@@ -47,7 +47,7 @@ export function useSequence(
           io.disconnect();
         }
       },
-      { rootMargin: "150% 0px" },
+      { rootMargin: "250% 0px" },
     );
     io.observe(canvas);
     return () => {

@@ -1,0 +1,284 @@
+{
+  "cheese-mentai": {
+    "passed": true,
+    "file_bytes": 1834464,
+    "triangles": 13858,
+    "root": "cheese_mentai_root",
+    "width_m": 0.06000000052154064,
+    "bounds_y_up_m": [
+      [
+        -0.030050674453377724,
+        0.0,
+        -0.029186712577939034
+      ],
+      [
+        0.029949326068162918,
+        0.04181801900267601,
+        0.030527595430612564
+      ]
+    ],
+    "embedded_images": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "bytes": 739200,
+        "format": "PNG"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "bytes": 116602,
+        "format": "JPEG"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "bytes": 417395,
+        "format": "PNG"
+      }
+    ],
+    "component_transforms": {
+      "cheese_surface": {
+        "translation": [
+          0.0,
+          0.038557663559913635,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "filling_core": {
+        "translation": [
+          0.0,
+          0.018639126792550087,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "garnish_details": {
+        "translation": [
+          0.0,
+          0.04073762893676758,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mentai_cap": {
+        "translation": [
+          0.0,
+          0.0366162434220314,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "wrapper_shell": {
+        "translation": [
+          0.0,
+          0.017233923077583313,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "unit_normals_and_tangents": true,
+    "non_degenerate_triangles": true,
+    "external_dependencies": false,
+    "required_extensions": []
+  },
+  "black-series": {
+    "passed": true,
+    "file_bytes": 1835608,
+    "triangles": 13858,
+    "root": "black_series_root",
+    "width_m": 0.05999999865889549,
+    "bounds_y_up_m": [
+      [
+        -0.030047407373785973,
+        0.0,
+        -0.029089858755469322
+      ],
+      [
+        0.02995259128510952,
+        0.0422108955681324,
+        0.030517322942614555
+      ]
+    ],
+    "embedded_images": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "bytes": 739593,
+        "format": "PNG"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "bytes": 116288,
+        "format": "JPEG"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "bytes": 418465,
+        "format": "PNG"
+      }
+    ],
+    "component_transforms": {
+      "cheese_surface": {
+        "translation": [
+          0.0,
+          0.038758374750614166,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "filling_core": {
+        "translation": [
+          0.0,
+          0.018639126792550087,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "garnish_details": {
+        "translation": [
+          0.0,
+          0.041221022605895996,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "topping_cap": {
+        "translation": [
+          0.0,
+          0.03711693733930588,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "wrapper_shell": {
+        "translation": [
+          0.0,
+          0.017983924597501755,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "unit_normals_and_tangents": true,
+    "non_degenerate_triangles": true,
+    "external_dependencies": false,
+    "required_extensions": []
+  }
+}

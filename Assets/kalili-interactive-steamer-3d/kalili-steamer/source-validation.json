@@ -1,0 +1,25 @@
+{
+  "packed_images": {
+    "bamboo-basecolor.jpg": 124731,
+    "bamboo-normal.png": 334703,
+    "bamboo-roughness.png": 121307,
+    "food-normal.png": 383322,
+    "food-roughness.png": 69847,
+    "meat-basecolor.png": 206762,
+    "wrapper-basecolor.png": 145270
+  },
+  "state_max_translation_error_metres": {
+    "0_closed": 0,
+    "72_open": 4.768371586472142e-09,
+    "102_hero_lifted": 4.768371586472142e-09,
+    "198_exploded": 4.768371586472142e-09,
+    "342_hero_lifted": 4.768371586472142e-09
+  },
+  "state_max_rotation_error_radians": {
+    "0_closed": 0,
+    "72_open": 0,
+    "102_hero_lifted": 0,
+    "198_exploded": 0,
+    "342_hero_lifted": 0
+  }
+}

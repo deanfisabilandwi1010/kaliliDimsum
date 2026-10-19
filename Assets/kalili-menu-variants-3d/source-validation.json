@@ -1,0 +1,64 @@
+{
+  "cheese-mentai": {
+    "passed": true,
+    "root": "cheese_mentai_root",
+    "mesh_nodes": [
+      "cheese_surface",
+      "filling_core",
+      "garnish_details",
+      "mentai_cap",
+      "wrapper_shell"
+    ],
+    "packed_images": [
+      {
+        "name": "cheese-mentai-basecolor.jpg",
+        "bytes": 116602,
+        "sha256": "1413d56bb7c952263c09537d54bfd0ce559195f39ca0469712801ea7a5cabe6b"
+      },
+      {
+        "name": "cheese-mentai-normal.png",
+        "bytes": 739200,
+        "sha256": "f99a5538e1e9d621afad05063497e3d9008114e2c08d5c56b3d79abbaa252e9c"
+      },
+      {
+        "name": "cheese-mentai-roughness.png",
+        "bytes": 194085,
+        "sha256": "8f97a088d106e11d2540aa4635bead0bf4b487dface6a48b71e8ae3c4fafd243"
+      }
+    ],
+    "default_pose": "assembled",
+    "width_m": 0.06000000052154064,
+    "bottom_z_m": 0.0
+  },
+  "black-series": {
+    "passed": true,
+    "root": "black_series_root",
+    "mesh_nodes": [
+      "cheese_surface",
+      "filling_core",
+      "garnish_details",
+      "topping_cap",
+      "wrapper_shell"
+    ],
+    "packed_images": [
+      {
+        "name": "black-series-basecolor.jpg",
+        "bytes": 116288,
+        "sha256": "552883fdaf6595a7e13516ab46a469134d666ea039a98beec991edc6dff0d4c9"
+      },
+      {
+        "name": "black-series-normal.png",
+        "bytes": 739593,
+        "sha256": "7106f1b7939ad7f3b2544d2bdab85336d00ae7053be654523d489484e8836ff7"
+      },
+      {
+        "name": "black-series-roughness.png",
+        "bytes": 194564,
+        "sha256": "b219fdd420507a20a4d3c3165d2485a86f9f7c220d0bcaa280e0f98cfe8a7882"
+      }
+    ],
+    "default_pose": "assembled",
+    "width_m": 0.05999999865889549,
+    "bottom_z_m": 0.0
+  }
+}

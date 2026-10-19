@@ -1,9 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { curtainTo } from "@/lib/motion/curtain";
+import { CART_BUMP } from "@/lib/motion/fly";
 import { ScrollTrigger } from "@/lib/motion/gsap";
 import { useExperience } from "./Experience";
 import { Arrow, Wordmark } from "./ui";
+
+/** Nama tujuan yang tampil sebentar di tengah tirai transisi. */
+const DESTINATIONS: Record<string, string> = {
+  top: "Selamat datang",
+  anatomi: "Di dalam satu gigitan",
+  ritual: "Ritual kecil Kalili",
+  menu: "Pilih yang bikin penasaran",
+  "black-series": "Black Series",
+  cerita: "Cerita Kalili",
+};
 
 const LINKS = [
   { href: "#menu", label: "Menu" },
@@ -25,6 +37,46 @@ export function SiteHeader() {
     return () => triggers.forEach((t) => t.kill());
   }, []);
 
+  // Sajian yang "terbang" ke tombol Pilihanmu: tombol menangkapnya dengan denyut.
+  // Nilai a/b bergantian supaya animasinya diputar ulang tiap kali.
+  const [bump, setBump] = useState("");
+  useEffect(() => {
+    const onBump = () => setBump((v) => (v === "a" ? "b" : "a"));
+    window.addEventListener(CART_BUMP, onBump);
+    return () => window.removeEventListener(CART_BUMP, onBump);
+  }, []);
+
+  // Tautan ke bagian yang jauh (Menu, Black Series, Cerita, Lihat Menu, logo):
+  // bukan menggulir melewati semua bagian di antaranya, tetapi tirai transisi
+  // yang memindahkan halaman di balik layar. Jarak dekat tetap menggulir biasa.
+  // Tautan kartu menu (#menu-…) ditangani MenuSection; tautan yang sudah
+  // ditangani komponennya sendiri (defaultPrevented) dan skip link dilewati.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (document.documentElement.dataset.motion !== "full") return;
+      const link = (e.target as Element).closest?.<HTMLAnchorElement>('a[href^="#"]');
+      if (!link || link.classList.contains("skip-link")) return;
+      const hash = link.getAttribute("href") ?? "";
+      if (hash.length < 2 || hash.startsWith("#menu-")) return;
+      const id = hash.slice(1);
+      const target = document.getElementById(id);
+      if (!target) return;
+      const top = target.getBoundingClientRect().top + window.scrollY;
+      if (Math.abs(top - window.scrollY) < window.innerHeight * 1.5) return;
+      e.preventDefault();
+      history.replaceState(null, "", hash);
+      // Diaktifkan dengan keyboard: titik asal = tengah tautannya.
+      const box = link.getBoundingClientRect();
+      const origin = e.detail === 0 || (!e.clientX && !e.clientY)
+        ? { x: box.left + box.width / 2, y: box.top + box.height / 2 }
+        : { x: e.clientX, y: e.clientY };
+      curtainTo({ top, origin, label: DESTINATIONS[id] ?? link.textContent?.trim() ?? "", arrive: id });
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+
   const closeNav = () => navRef.current?.close();
 
   return (
@@ -39,7 +91,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="header__actions">
-          <button className="header__cart" type="button" onClick={openDrawer} aria-label={`Pilihanmu, ${count} menu tersimpan`}>
+          <button className="header__cart" type="button" data-bump={bump || undefined} onClick={openDrawer} aria-label={`Pilihanmu, ${count} menu tersimpan`}>
             <span className="header__cart-label">Pilihanmu</span>
             <span className="header__cart-count" key={count}>{count}</span>
             <Arrow />

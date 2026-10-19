@@ -1,0 +1,166 @@
+{
+  "cheese-mentai": {
+    "file": "kalili-cheese-mentai.glb",
+    "geometry_nodes": {
+      "wrapper_shell": {
+        "triangles": 5488,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 7.259856958606107e-06
+      },
+      "filling_core": {
+        "triangles": 1842,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 6.162760944791311e-05
+      },
+      "mentai_cap": {
+        "triangles": 3648,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 1.2707697113362421e-05
+      },
+      "cheese_surface": {
+        "triangles": 2400,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 5.197955773951567e-06
+      },
+      "garnish_details": {
+        "triangles": 480,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 6.705530337964404e-10
+      }
+    },
+    "triangle_count": 13858,
+    "independent_motion": {
+      "wrapper_shell": true,
+      "filling_core": true,
+      "mentai_cap": true,
+      "cheese_surface": true,
+      "garnish_details": true
+    },
+    "bounds_blender_z_up": [
+      [
+        -0.030050674453377724,
+        -0.030527595430612564,
+        0.0
+      ],
+      [
+        0.029949326068162918,
+        0.029186712577939034,
+        0.04181801900267601
+      ]
+    ],
+    "width_m": 0.06000000052154064,
+    "height_m": 0.04181801900267601,
+    "image_payloads": [
+      {
+        "name": "cheese-mentai-basecolor",
+        "size": [
+          1024,
+          1024
+        ],
+        "first_pixel": 0.8196079134941101,
+        "packed_bytes": 116602
+      },
+      {
+        "name": "cheese-mentai-normal",
+        "size": [
+          1024,
+          1024
+        ],
+        "first_pixel": 0.501960813999176,
+        "packed_bytes": 739200
+      },
+      {
+        "name": "cheese-mentai-roughness",
+        "size": [
+          1024,
+          1024
+        ],
+        "first_pixel": 1.0,
+        "packed_bytes": 417395
+      }
+    ],
+    "images_loaded": true
+  },
+  "black-series": {
+    "file": "kalili-black-series.glb",
+    "geometry_nodes": {
+      "wrapper_shell": {
+        "triangles": 5488,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 7.3663962871429665e-06
+      },
+      "filling_core": {
+        "triangles": 1842,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 4.9916635857473284e-05
+      },
+      "topping_cap": {
+        "triangles": 3648,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 1.0439727784033137e-05
+      },
+      "cheese_surface": {
+        "triangles": 2400,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 4.379926989043905e-06
+      },
+      "garnish_details": {
+        "triangles": 480,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 5.8182772396535e-10
+      }
+    },
+    "triangle_count": 13858,
+    "independent_motion": {
+      "wrapper_shell": true,
+      "filling_core": true,
+      "topping_cap": true,
+      "cheese_surface": true,
+      "garnish_details": true
+    },
+    "bounds_blender_z_up": [
+      [
+        -0.030047407373785973,
+        -0.030517322942614555,
+        0.0
+      ],
+      [
+        0.02995259128510952,
+        0.029089858755469322,
+        0.0422108955681324
+      ]
+    ],
+    "width_m": 0.05999999865889549,
+    "height_m": 0.0422108955681324,
+    "image_payloads": [
+      {
+        "name": "black-series-basecolor",
+        "size": [
+          1024,
+          1024
+        ],
+        "first_pixel": 0.8196079134941101,
+        "packed_bytes": 116288
+      },
+      {
+        "name": "black-series-normal",
+        "size": [
+          1024,
+          1024
+        ],
+        "first_pixel": 0.501960813999176,
+        "packed_bytes": 739593
+      },
+      {
+        "name": "black-series-roughness",
+        "size": [
+          1024,
+          1024
+        ],
+        "first_pixel": 1.0,
+        "packed_bytes": 418465
+      }
+    ],
+    "images_loaded": true
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { brand } from "@/content/brand";
 import { productById } from "@/content/products";
 import type { Selection } from "@/lib/order-message";
@@ -12,7 +12,7 @@ type ExperienceValue = {
   /** true setelah gerbang pembuka selesai, dilewati, atau gagal. */
   entered: boolean;
   enter: () => void;
-  /** true sejak video pembuka mulai: hero menyiapkan videonya di balik gerbang. */
+  /** true jika pengunjung menekan "Buka kukusannya" di gerbang: hero lalu membuka kukusan 3D-nya sendiri. */
   warm: boolean;
   warmUp: () => void;
   sound: boolean;
@@ -21,6 +21,8 @@ type ExperienceValue = {
   count: number;
   setQuantity: (id: string, qty: number) => void;
   toggle: (id: string) => void;
+  /** Tambah satu satuan jual; jika sudah ada, jumlah di baris yang sama bertambah. */
+  add: (id: string) => void;
   drawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -29,6 +31,8 @@ type ExperienceValue = {
 
 const ExperienceContext = createContext<ExperienceValue | null>(null);
 const SELECTION_KEY = "kalili:selection";
+/** Batas komposisi ringkas (mobile/potret) yang dipakai CSS dan semua adegan scroll. */
+const COMPACT_QUERY = "(max-width: 760px), (max-aspect-ratio: 1/1)";
 
 export function useExperience() {
   const value = useContext(ExperienceContext);
@@ -66,12 +70,22 @@ export function Experience({ children }: { children: React.ReactNode }) {
     document.documentElement.dataset.motion = lite ? "lite" : "full";
   }, [lite]);
 
+  // Adegan scroll dan 3D mengukur tata letak sekali saat dipasang. Jika
+  // jendela berpindah antara komposisi lebar dan ringkas (mis. diperkecil di
+  // DevTools atau tablet diputar), semua bagian dipasang ulang seperti baru
+  // dibuka di ukuran itu, supaya tidak ada posisi sisa komposisi lama.
+  // Pilihan menu dan status gerbang tetap (disimpan di sini/sessionStorage).
+  const [layoutVersion, setLayoutVersion] = useState(0);
+  useEffect(() => {
+    const mq = window.matchMedia(COMPACT_QUERY);
+    const onChange = () => setLayoutVersion((v) => v + 1);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   const [warm, setWarm] = useState(false);
   const warmUp = useCallback(() => setWarm(true), []);
-  const enter = useCallback(() => {
-    setWarm(true);
-    setEntered(true);
-  }, []);
+  const enter = useCallback(() => setEntered(true), []);
 
   const setQuantity = useCallback((id: string, qty: number) => {
     setSelection((prev) => {
@@ -95,6 +109,19 @@ export function Experience({ children }: { children: React.ReactNode }) {
     [setQuantity],
   );
 
+  const add = useCallback(
+    (id: string) => {
+      const product = productById(id);
+      if (!product) return;
+      const qty = (selectionRef.current[id] ?? 0) + 1;
+      // Ref diperbarui langsung: dua klik cepat sebelum render tetap terhitung dua.
+      selectionRef.current = { ...selectionRef.current, [id]: Math.min(qty, 99) };
+      setQuantity(id, qty);
+      setAnnouncement(qty > 1 ? `${product.name} ditambahkan, jumlah ${qty}` : `${product.name} ditambahkan ke pilihan`);
+    },
+    [setQuantity],
+  );
+
   const openDrawer = useCallback(() => setDrawerOpen(true), []);
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
@@ -102,14 +129,14 @@ export function Experience({ children }: { children: React.ReactNode }) {
     () => ({
       lite, entered, enter, warm, warmUp, sound, setSound, selection,
       count: Object.keys(selection).length,
-      setQuantity, toggle, drawerOpen, openDrawer, closeDrawer, announcement,
+      setQuantity, toggle, add, drawerOpen, openDrawer, closeDrawer, announcement,
     }),
-    [lite, entered, enter, warm, warmUp, sound, selection, setQuantity, toggle, drawerOpen, openDrawer, closeDrawer, announcement],
+    [lite, entered, enter, warm, warmUp, sound, selection, setQuantity, toggle, add, drawerOpen, openDrawer, closeDrawer, announcement],
   );
 
   return (
     <ExperienceContext.Provider value={value}>
-      {children}
+      <Fragment key={layoutVersion}>{children}</Fragment>
       <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
     </ExperienceContext.Provider>
   );

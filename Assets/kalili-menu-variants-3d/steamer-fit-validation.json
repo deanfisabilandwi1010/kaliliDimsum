@@ -1,0 +1,390 @@
+{
+  "cheese-mentai": {
+    "fits_existing_closed_steamer": true,
+    "uniform_scale": 1,
+    "root_local_translation": [
+      0,
+      0,
+      0
+    ],
+    "hero_anchor_blender_z_up": [
+      0.0,
+      -0.05000000074505806,
+      0.009999999776482582
+    ],
+    "bottom_world_m": 0.009999999776482582,
+    "external_collision_pairs_tested": 35,
+    "intersections": 0,
+    "pairs": [
+      {
+        "part": "cheese_surface",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "mentai_cap",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      }
+    ]
+  },
+  "black-series": {
+    "fits_existing_closed_steamer": true,
+    "uniform_scale": 1,
+    "root_local_translation": [
+      0,
+      0,
+      0
+    ],
+    "hero_anchor_blender_z_up": [
+      0.0,
+      -0.05000000074505806,
+      0.009999999776482582
+    ],
+    "bottom_world_m": 0.009999999776482582,
+    "external_collision_pairs_tested": 35,
+    "intersections": 0,
+    "pairs": [
+      {
+        "part": "cheese_surface",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "cheese_surface",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "filling_core",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "garnish_details",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "topping_cap",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "steamer_base",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "steamer_lid",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "brand_badge",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_01",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_02",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_03",
+        "intersecting_triangle_pairs": 0
+      },
+      {
+        "part": "wrapper_shell",
+        "obstacle": "dimsum_support_04",
+        "intersecting_triangle_pairs": 0
+      }
+    ]
+  }
+}
